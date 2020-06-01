@@ -137,7 +137,7 @@ export default class Response {
 
   get length(): number {
     if (this.has('Content-Length')) {
-      return parseInt(this.get('Content-Length'), 10) || 0;
+      return parseInt(<string> this.get('Content-Length'), 10) || 0;
     }
 
     const { body } = this;
