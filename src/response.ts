@@ -6,6 +6,12 @@ import { extname } from 'path';
 import contentDisposition from 'content-disposition';
 import getType from 'cache-content-type';
 import typeis from 'type-is';
+import assert from 'assert';
+import statuses from 'statuses';
+import Stream from 'stream';
+import destroy from 'destroy';
+import onFinish from 'on-finished';
+import encodeUrl from 'encodeurl';
 
 import only from './utils/only';
 
@@ -24,14 +30,13 @@ export default class Response {
 
   public _explicitNullBody: boolean;
   private _body: any;
+  private _explicitStatus: boolean;
 
-  get sockect(): Socket {
+  get socket(): Socket {
     return this.res.socket;
   }
 
   get header(): http.OutgoingHttpHeaders {
-    // Note: previously had support for Node < 7.7
-    // accessed this.res._headers
     return this.res.getHeaders();
   }
 
@@ -43,202 +48,31 @@ export default class Response {
     return this.res.statusCode;
   }
 
-  get headerSent(): boolean {
-    return this.res.headersSent;
-  }
-
-  vary(field: string | string[]) {
+  set status(code: number) {
     if (this.headerSent) return;
 
-    vary(this.res, field);
+    assert(Number.isInteger(code), 'status code must be a number');
+    assert(code >= 100 && code <= 999, `invalid status code: ${code}`);
+    this._explicitStatus = true;
+    this.res.statusCode = code;
+    if (this.req.httpVersionMajor < 2) this.res.statusMessage = statuses[code];
+    if (this.body && statuses.empty[code]) this.body = null;
   }
 
-  is(type: string, ...types: string[]): string | false | null {
-    return typeis(this.type, type, ...types);
+  get message(): string {
+    return this.res.statusMessage || statuses[this.status];
   }
 
-  get(field: string): string | number | string[] {
-    return this.res.getHeader(field);
-
-    // previous implementation
-    //return this.header[field.toLowerCase()] || '';
+  set message(msg: string) {
+    this.res.statusMessage = msg;
   }
 
-  has(field: string): boolean {
-    // Removed support for Node 7.7
-    // field.toLowerCase() in this.headers
-    return this.res.hasHeader(field);
-  }
-
-  set(field: string | string[], val: string | number | string[]) {
-    if (this.headerSent) return;
-
-    if (field instanceof Array) {
-      for (const key in field) {
-        this.set(key, field[key]);
-      }
-    } else {
-      if (Array.isArray(val)) val = val.map(v => typeof v === 'string' ? v : String(v));
-      else if (typeof val !== 'string') val = String(val);
-      this.res.setHeader(field, val);
-    }
-  }
-
-  append(field: string, val: string | number | string[]) {
-    const prev = this.get(field);
-
-    // TODO: this is gross figure out something better
-    if (prev && typeof val !== 'number') {
-      if (prev instanceof Array) {
-        this.set(field, prev.concat(val));
-      } else { 
-        this.set(field, [<string> prev].concat(val));
-      }
-    } else {
-      this.set(field, val);
-    }
-
-
-    // previous implementation
-    //if (prev) {
-      //val = Array.isArray(prev)
-        //? prev.concat(val)
-        //: [prev].concat(val);
-    //}
-
-    // TODO: why is this returning?
-    //return this.set(field, val);
-  }
-
-  remove(field: string) {
-    if (this.headerSent) return;
-
-    this.res.removeHeader(field);
-  }
-
-  get writable(): boolean {
-    // can't write any more after response finished
-    // response.writableEnded is available since Node > 12.9
-    // https://nodejs.org/api/http.html#http_response_writableended
-    // response.finished is undocumented feature of previous Node versions
-    // https://stackoverflow.com/questions/16254385/undocumented-response-finished-in-node-js
-    if (this.res.writableEnded || this.res.finished) return false;
-
-    const socket = this.res.socket;
-    // There are already pending outgoing res, but still writable
-    // https://github.com/nodejs/node/blob/v4.4.7/lib/_http_server.js#L486
-    if (!socket) return true;
-    return socket.writable;
-  }
-
-  flushHeaders() {
-    this.res.flushHeaders();
-  }
-
-  toJSON(): object {
-    return only(this, [
-      'status',
-      'message',
-      'header'
-    ]);
-  }
-
-  inspect() {
-    if (!this.res) return;
-    const o = this.toJSON();
-    o.body = this.body;
-    return o;
-  }
-
-  set etag(val: string) {
-    if (!/^(W\/)?"/.test(val)) val = `"${val}"`;
-    this.set('ETag', val);
-  }
-
-  get etag() {
-    return this.get('ETag');
-  }
-
-  get type(): string {
-    const type = this.get('Content-Type');
-    if (typeof type === 'string') {
-      return type.split(';', 1)[0];
-    } else {
-      return '';
-    }
-
-    // Previous implementation
-    //const type = this.get('Content-Type');
-    //if (!type) return '';
-    //return type.split(';', 1)[0];
-  }
-
-  set lastModified(val: string | Date) {
-    if ('string' === typeof val) val = new Date(val);
-    this.set('Last-Modified', val.toUTCString());
-  }
-
-  get lastModified(): Date {
-    const date = this.get('last-modified');
-    if (date) return new Date(date);
-  }
-
-  set type(type) {
-    type = getType(type);
-    if (type) {
-      this.set('Content-Type', type);
-    } else {
-      this.remove('Content-Type');
-    }
-  }
-
-  attachment(filename: string, options: contentDisposition.Options) {
-    if (filename) this.type = extname(filename);
-    this.set('Content-Disposition', contentDisposition(filename, options));
-  }
-
-  redirect(url, alt) {
-    // location
-    if ('back' === url) url = this.ctx.get('Referrer') || alt || '/';
-    this.set('Location', encodeUrl(url));
-
-    // status
-    if (!statuses.redirect[this.status]) this.status = 302;
-
-    // html
-    if (this.ctx.accepts('html')) {
-      url = escape(url);
-      this.type = 'text/html; charset=utf-8';
-      this.body = `Redirecting to <a href="${url}">${url}</a>.`;
-      return;
-    }
-
-    // text
-    this.type = 'text/plain; charset=utf-8';
-    this.body = `Redirecting to ${url}.`;
-  }
-
-  set length(n) {
-    this.set('Content-Length', n);
-  }
-
-  get length() {
-    if (this.has('Content-Length')) {
-      return parseInt(this.get('Content-Length'), 10) || 0;
-    }
-
-    const { body } = this;
-    if (!body || body instanceof Stream) return undefined;
-    if ('string' === typeof body) return Buffer.byteLength(body);
-    if (Buffer.isBuffer(body)) return body.length;
-    return Buffer.byteLength(JSON.stringify(body));
-  }
-
-  get body() {
+  // TODO: set appropriate type
+  get body(): any {
     return this._body;
   }
 
-  set body(val) {
+  set body(val: any) {
     const original = this._body;
     this._body = val;
 
@@ -290,23 +124,188 @@ export default class Response {
     this.type = 'json';
   }
 
-  get message() {
-    return this.res.statusMessage || statuses[this.status];
+  set length(n: number) {
+    this.set('Content-Length', n);
   }
 
-  set message(msg) {
-    this.res.statusMessage = msg;
+  get length() {
+    if (this.has('Content-Length')) {
+      return parseInt(this.get('Content-Length'), 10) || 0;
+    }
+
+    const { body } = this;
+    if (!body || body instanceof Stream) return undefined;
+    if ('string' === typeof body) return Buffer.byteLength(body);
+    if (Buffer.isBuffer(body)) return body.length;
+    return Buffer.byteLength(JSON.stringify(body));
   }
-  
-  set status(code) {
+
+  get headerSent(): boolean {
+    return this.res.headersSent;
+  }
+
+  vary(field: string) {
     if (this.headerSent) return;
 
-    assert(Number.isInteger(code), 'status code must be a number');
-    assert(code >= 100 && code <= 999, `invalid status code: ${code}`);
-    this._explicitStatus = true;
-    this.res.statusCode = code;
-    if (this.req.httpVersionMajor < 2) this.res.statusMessage = statuses[code];
-    if (this.body && statuses.empty[code]) this.body = null;
+    vary(this.res, field);
+  }
+
+  redirect(url: string, alt: string) {
+    // location
+    if ('back' === url) url = this.ctx.get('Referrer') || alt || '/';
+    this.set('Location', encodeUrl(url));
+
+    // status
+    if (!statuses.redirect[this.status]) this.status = 302;
+
+    // html
+    if (this.ctx.accepts('html')) {
+      url = escape(url);
+      this.type = 'text/html; charset=utf-8';
+      this.body = `Redirecting to <a href="${url}">${url}</a>.`;
+      return;
+    }
+
+    // text
+    this.type = 'text/plain; charset=utf-8';
+    this.body = `Redirecting to ${url}.`;
+  }
+
+  /**
+   * Set Content-Disposition header to "attachment" with optional `filename`.
+   *
+   * @param {String} filename
+   * @api public
+   */
+
+  attachment(filename: string, options: Options) {
+    if (filename) this.type = extname(filename);
+    this.set('Content-Disposition', contentDisposition(filename, options));
+  }
+
+  set type(type: string) {
+    type = getType(type);
+    if (type) {
+      this.set('Content-Type', type);
+    } else {
+      this.remove('Content-Type');
+    }
+  }
+
+  set lastModified(val: string | Date) {
+    if ('string' === typeof val) val = new Date(val);
+    this.set('Last-Modified', val.toUTCString());
+  }
+
+  get lastModified(): Date {
+    const date = this.get('last-modified');
+    if (date) return new Date(date);
+  }
+
+  set etag(val: string) {
+    if (!/^(W\/)?"/.test(val)) val = `"${val}"`;
+    this.set('ETag', val);
+  }
+
+  get etag(): string {
+    return this.get('ETag');
+  }
+
+  get type(): string {
+    const type = this.get('Content-Type');
+    if (!type) return '';
+    return type.split(';', 1)[0];
+  }
+
+  /**
+   * Check whether the response is one of the listed types.
+   * Pretty much the same as `this.request.is()`.
+   *
+   * @param {String|String[]} [type]
+   * @param {String[]} [types]
+   * @return {String|false}
+   * @api public
+   */
+
+  is(type: string | string[], ...types: string[]): string | false {
+    return typeis(this.type, type, ...types);
+  }
+
+  get(field: string): string {
+    return this.header[field.toLowerCase()] || '';
+  }
+
+  has(field: string): boolean {
+    return typeof this.res.hasHeader === 'function'
+      ? this.res.hasHeader(field)
+      // Node < 7.7
+      : field.toLowerCase() in this.headers;
+  }
+
+  set(field: string | object | string[], val: string) {
+    if (this.headerSent) return;
+
+    if (2 === arguments.length) {
+      if (Array.isArray(val)) val = val.map(v => typeof v === 'string' ? v : String(v));
+      else if (typeof val !== 'string') val = String(val);
+      this.res.setHeader(field, val);
+    } else {
+      for (const key in field) {
+        this.set(key, field[key]);
+      }
+    }
+  }
+
+  append(field: string, val: string | string[]) {
+    const prev = this.get(field);
+
+    if (prev) {
+      val = Array.isArray(prev)
+        ? prev.concat(val)
+        : [prev].concat(val);
+    }
+
+    return this.set(field, val);
+  }
+
+  remove(field: string) {
+    if (this.headerSent) return;
+
+    this.res.removeHeader(field);
+  }
+
+  get writable(): boolean {
+    // can't write any more after response finished
+    // response.writableEnded is available since Node > 12.9
+    // https://nodejs.org/api/http.html#http_response_writableended
+    // response.finished is undocumented feature of previous Node versions
+    // https://stackoverflow.com/questions/16254385/undocumented-response-finished-in-node-js
+    if (this.res.writableEnded || this.res.finished) return false;
+
+    const socket = this.res.socket;
+    // There are already pending outgoing res, but still writable
+    // https://github.com/nodejs/node/blob/v4.4.7/lib/_http_server.js#L486
+    if (!socket) return true;
+    return socket.writable;
+  }
+
+  inspect(): object {
+    if (!this.res) return;
+    const o = this.toJSON();
+    o.body = this.body;
+    return o;
+  }
+
+  toJSON(): object {
+    return only(this, [
+      'status',
+      'message',
+      'header'
+    ]);
+  }
+
+  flushHeaders() {
+    this.res.flushHeaders();
   }
 }
 
