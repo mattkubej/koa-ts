@@ -19,6 +19,13 @@ import Application from './application';
 import Context from './context';
 import Request from './request';
 
+type ResponseJSON = {
+  status?: any;
+  message?: any;
+  header?: any;
+  body?: any;
+};
+
 export default class Response {
 
   public req: http.IncomingMessage;
@@ -128,7 +135,7 @@ export default class Response {
     this.set('Content-Length', n);
   }
 
-  get length() {
+  get length(): number {
     if (this.has('Content-Length')) {
       return parseInt(this.get('Content-Length'), 10) || 0;
     }
@@ -178,7 +185,7 @@ export default class Response {
    * @api public
    */
 
-  attachment(filename: string, options: Options) {
+  attachment(filename: string, options: contentDisposition.Options) {
     if (filename) this.type = extname(filename);
     this.set('Content-Disposition', contentDisposition(filename, options));
   }
@@ -242,7 +249,7 @@ export default class Response {
       : field.toLowerCase() in this.headers;
   }
 
-  set(field: string | object | string[], val: string) {
+  set(field: string | object | string[], val: string | number) {
     if (this.headerSent) return;
 
     if (2 === arguments.length) {
@@ -289,14 +296,14 @@ export default class Response {
     return socket.writable;
   }
 
-  inspect(): object {
+  inspect(): ResponseJSON {
     if (!this.res) return;
     const o = this.toJSON();
     o.body = this.body;
     return o;
   }
 
-  toJSON(): object {
+  toJSON(): ResponseJSON {
     return only(this, [
       'status',
       'message',
