@@ -95,8 +95,9 @@ export default class Context {
       //res._headers = {}; // Node < 7.7
     //}
 
+    // TODO: where is set defined and what is the purpose of this?
     // then set those specified
-    this.set(err.headers);
+    //this.set(err.headers);
 
     // force text/plain
     this.type = 'text';

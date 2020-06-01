@@ -42,9 +42,9 @@ export default class Application extends EventEmitter {
   public proxyIpHeader: string;
   public maxIpsCount: number;
   public subdomainOffset: number;
+  public keys: any;
 
   private env: string;
-  private keys: any;
   private middleware: any[];
 
   //private context: Context;
