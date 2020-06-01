@@ -215,11 +215,11 @@ export default class Response {
   }
 
   get etag(): string {
-    return this.get('ETag');
+    return <string> this.get('ETag');
   }
 
   get type(): string {
-    const type = this.get('Content-Type');
+    const type = <string> this.get('Content-Type');
     if (!type) return '';
     return type.split(';', 1)[0];
   }
@@ -238,7 +238,7 @@ export default class Response {
     return typeis(this.type, type, ...types);
   }
 
-  get(field: string): string {
+  get(field: string): string | number | string[] {
     return this.header[field.toLowerCase()] || '';
   }
 
