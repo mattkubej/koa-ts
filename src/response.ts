@@ -159,7 +159,7 @@ export default class Response {
 
   redirect(url: string, alt: string) {
     // location
-    if ('back' === url) url = this.ctx.get('Referrer') || alt || '/';
+    if ('back' === url) url = <string> this.ctx.get('Referrer') || alt || '/';
     this.set('Location', encodeUrl(url));
 
     // status
