@@ -257,17 +257,16 @@ export default class Response {
       : field.toLowerCase() in this.headers;
   }
 
-  set(field: string | object | string[], val: string | number) {
+  // TODO: why in the original implementation was field potentially an array?
+  set(field: string | object, val?: string | number | string[]) {
     if (this.headerSent) return;
 
-    if (2 === arguments.length) {
-      if (Array.isArray(val)) val = val.map(v => typeof v === 'string' ? v : String(v));
-      else if (typeof val !== 'string') val = String(val);
-      this.res.setHeader(field, val);
-    } else {
+    if (typeof field === 'object') {
       for (const key in field) {
         this.set(key, field[key]);
       }
+    } else {
+      this.res.setHeader(field, val);
     }
   }
 
@@ -275,9 +274,11 @@ export default class Response {
     const prev = this.get(field);
 
     if (prev) {
-      val = Array.isArray(prev)
-        ? prev.concat(val)
-        : [prev].concat(val);
+      if (Array.isArray(prev)) {
+        val = prev.concat(val);
+      } else {
+        val = [String(prev)].concat(val);
+      }
     }
 
     return this.set(field, val);
