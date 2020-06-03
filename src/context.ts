@@ -202,7 +202,7 @@ export default class Context {
     return this.response.type;
   }
 
-  set lastModified(val: Date) {
+  set lastModified(val: Date | string) {
     this.response.lastModified = val;
   }
 
