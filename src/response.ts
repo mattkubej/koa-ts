@@ -235,8 +235,15 @@ export default class Response {
    * @api public
    */
 
-  is(type: string | string[], ...types: string[]): string | false {
-    return typeis(this.type, type, ...types);
+  // TODO: original implementation specified first type as: string | string[]
+  //       should this just be string?
+  is(type: string, ...types: string[]): string | false {
+
+    // TODO: original implementation doesn't appropriately satisfy typeis();
+    //       first parameter should be the req
+    // return typeis(this.type, type, ...types);
+
+    return typeis(this.req, this.type, type, ...types);
   }
 
   get(field: string): string | number | string[] {
