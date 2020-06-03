@@ -202,7 +202,7 @@ export default class Request {
     // TODO: not sure if this is right
     if (this.socket instanceof TLSSocket) return 'https';
     if (!this.app.proxy) return 'http';
-    const proto = this.get('X-Forwarded-Proto');
+    const proto = <string> this.get('X-Forwarded-Proto');
     return proto ? proto.split(/\s*,\s*/, 1)[0] : 'http';
   }
 
@@ -212,7 +212,7 @@ export default class Request {
 
   get ips(): string[] {
     const proxy = this.app.proxy;
-    const val = this.get(this.app.proxyIpHeader);
+    const val = <string> this.get(this.app.proxyIpHeader);
     let ips = proxy && val
       ? val.split(/\s*,\s*/)
       : [];
@@ -299,7 +299,7 @@ export default class Request {
   }
 
   get type(): string {
-    const type = this.get('Content-Type');
+    const type = <string> this.get('Content-Type');
     if (!type) return '';
     return type.split(';')[0];
   }
