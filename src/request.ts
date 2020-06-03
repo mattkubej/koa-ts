@@ -127,10 +127,10 @@ export default class Request {
 
   get host(): string {
     const proxy = this.app.proxy;
-    let host = proxy && this.get('X-Forwarded-Host');
+    let host = proxy && <string> this.get('X-Forwarded-Host');
     if (!host) {
-      if (this.req.httpVersionMajor >= 2) host = this.get(':authority');
-      if (!host) host = this.get('Host');
+      if (this.req.httpVersionMajor >= 2) host = <string> this.get(':authority');
+      if (!host) host = <string> this.get('Host');
     }
     if (!host) return '';
     return host.split(/\s*,\s*/, 1)[0];
