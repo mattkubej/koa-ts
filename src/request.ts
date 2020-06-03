@@ -4,6 +4,7 @@ import { format, URL } from 'url';
 
 import http from 'http';
 import net, { Socket } from "net";
+import { TLSSocket } from "tls";
 
 import contentType from 'content-type';
 import accepts from 'accepts';
@@ -198,7 +199,8 @@ export default class Request {
   }
 
   get protocol(): string {
-    if (this.socket.encrypted) return 'https';
+    // TODO: not sure if this is right
+    if (this.socket instanceof TLSSocket) return 'https';
     if (!this.app.proxy) return 'http';
     const proto = this.get('X-Forwarded-Proto');
     return proto ? proto.split(/\s*,\s*/, 1)[0] : 'http';
