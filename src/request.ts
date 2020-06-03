@@ -104,7 +104,6 @@ export default class Request {
     return <string> parseurl(this.req).query || '';
   }
 
-  // TODO: add types here
   set querystring(str: string) {
     const url = parseurl(this.req);
     if (url.search === `?${str}`) return;
