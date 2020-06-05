@@ -9,6 +9,7 @@ import onFinished from 'on-finished';
 import statuses from 'statuses';
 import Stream from 'stream';
 import util from 'util';
+import { HttpError, HttpErrorConstructor } from 'http-errors';
 
 const debug = Debug('koa:application');
 const deprecate = Deprecate('koa');
@@ -43,9 +44,9 @@ export default class Application extends EventEmitter {
   public maxIpsCount: number;
   public subdomainOffset: number;
   public keys: any;
-
-  private env: string;
-  private middleware: any[];
+  public env: string;
+  public middleware: any[];
+  public static HttpError: HttpErrorConstructor = HttpError;
 
   //private context: Context;
   //private request: Request;

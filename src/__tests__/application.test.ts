@@ -43,4 +43,44 @@ describe('app', () => {
       .get('/')
       .end(() => {});
   });
+
+  it('should set development env when NODE_ENV missing', () => {
+    const NODE_ENV = process.env.NODE_ENV;
+    process.env.NODE_ENV = '';
+    const app = new Koa();
+    process.env.NODE_ENV = NODE_ENV;
+    expect(app.env).toBe('development');
+  });
+
+  it('should set env from the constructor', () => {
+    const env = 'custom';
+    const app = new Koa({ env });
+    expect(app.env).toStrictEqual(env);
+  });
+
+  it('should set proxy flag from the constructor', () => {
+    const proxy = true;
+    const app = new Koa({ proxy });
+    expect(app.proxy).toStrictEqual(proxy);
+  });
+
+  it('should set signed cookie keys from the constructor', () => {
+    const keys = ['customkey'];
+    const app = new Koa({ keys });
+    expect(app.keys).toStrictEqual(keys);
+  });
+
+  it('should set subdomainOffset from the constructor', () => {
+    const subdomainOffset = 3;
+    const app = new Koa({ subdomainOffset });
+    expect(app.subdomainOffset).toStrictEqual(subdomainOffset);
+  });
+
+  it('should have a static property exporting `HttpError` from http-errors library', () => {
+    const CreateError = require('http-errors');
+
+    expect(Koa.HttpError).not.toBe(undefined);
+    expect(Koa.HttpError).toStrictEqual(CreateError.HttpError);
+    expect(() => { throw new CreateError(500, 'test error'); }).toThrow(Koa.HttpError);
+  });
 });
