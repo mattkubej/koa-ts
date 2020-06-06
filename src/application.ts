@@ -48,9 +48,9 @@ export default class Application extends EventEmitter {
   public middleware: any[];
   public static HttpError: HttpErrorConstructor = HttpError;
 
-  //private context: Context;
-  //private request: Request;
-  //private response: Response;
+  //public context: Context;
+  //public request: Request;
+  //public response: Response;
 
   constructor(options: Options = {}) {
     super()
@@ -66,9 +66,9 @@ export default class Application extends EventEmitter {
     //this.request = new Request();
     //this.response = new Response();
 
-    //if (util.inspect.custom) {
-      //this[util.inspect.custom] = this.inspect;
-    //}
+    if (util.inspect.custom) {
+      this[util.inspect.custom] = this.inspect;
+    }
   }
 
   listen(...args: any[]) {

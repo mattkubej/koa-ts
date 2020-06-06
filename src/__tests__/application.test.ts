@@ -1,6 +1,7 @@
 import Koa from '../application';
 import Context from '../context';
 import request from 'supertest';
+import util from 'util';
 
 describe('app', () => {
   it('should handle socket errors', done => {
@@ -83,4 +84,21 @@ describe('app', () => {
     expect(Koa.HttpError).toStrictEqual(CreateError.HttpError);
     expect(() => { throw new CreateError(500, 'test error'); }).toThrow(Koa.HttpError);
   });
+
+  describe('app.context', () => {
+  });
+
+  describe('app.inspect()', () => {
+    const app = new Koa();
+
+    it('should work', () => {
+      const str = util.inspect(app);
+      expect("{ subdomainOffset: 2, proxy: false, env: 'test' }").toBe(str);
+    });
+
+    it('should return a json representation', () => {
+      expect({ subdomainOffset: 2, proxy: false, env: 'test' }).toStrictEqual(app.inspect());
+    });
+  });
+
 });
