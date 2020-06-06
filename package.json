@@ -58,6 +58,7 @@
     "@types/jest": "25.2.3",
     "@types/supertest": "2.0.9",
     "jest": "26.0.1",
+    "mm": "3.2.0",
     "supertest": "4.0.2",
     "ts-jest": "26.1.0"
   }

@@ -20,7 +20,7 @@ import Response from './response';
 
 import only from './utils/only';
 
-type Err = {
+export class KoaError extends Error {
   expose?: boolean;
   status?: number;
 };
@@ -139,7 +139,7 @@ export default class Application extends EventEmitter {
     return context;
   }
 
-  onerror(err: Err) {
+  onerror(err: KoaError | string) {
     if (!(err instanceof Error)) throw new TypeError(util.format('non-error thrown: %j', err));
 
     // not sure what err.expose is
