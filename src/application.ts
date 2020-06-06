@@ -188,7 +188,9 @@ function respond(ctx: Context) {
     if (ctx.req.httpVersionMajor >= 2) {
       body = String(code);
     } else {
-      body = ctx.message || String(code);
+      // TODO: this differs from the original implementation, but supports 
+      //       existing tests
+      body = ctx.message || statuses.message[code] || String(code);
     }
     if (!res.headersSent) {
       ctx.type = 'text';

@@ -104,10 +104,10 @@ export default class Context {
     if ('ENOENT' === err.code) statusCode = 404;
 
     // default to 500
-    if ('number' !== typeof statusCode || !statuses[statusCode]) statusCode = 500;
+    if ('number' !== typeof statusCode || !statuses.message[statusCode]) statusCode = 500;
 
     // respond
-    const code = statuses[statusCode];
+    const code = statuses.message[statusCode];
     const msg = err.expose ? err.message : code;
     this.status = err.status = statusCode;
     this.length = Buffer.byteLength(msg);
