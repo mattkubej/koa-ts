@@ -23,6 +23,8 @@ import only from './utils/only';
 export class KoaError extends Error {
   expose?: boolean;
   status?: number;
+  statusCode?: number;
+  code?: string;
 };
 
 type Options = {
