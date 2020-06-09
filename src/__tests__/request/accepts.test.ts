@@ -40,14 +40,14 @@ describe('ctx.accepts(types)', () => {
     });
   });
 
-  //describe('when an array is given', () => {
-    //it('should return the first match', () => {
-      //const ctx = context();
-      //ctx.req.headers.accept = 'text/plain, text/html';
-      //expect(ctx.accepts(['png', 'text', 'html'])).toBe('text');
-      //expect(ctx.accepts(['png', 'html'])).toBe('html');
-    //});
-  //});
+  describe('when an array is given', () => {
+    it('should return the first match', () => {
+      const ctx = context();
+      ctx.req.headers.accept = 'text/plain, text/html';
+      expect(ctx.accepts(['png', 'text', 'html'])).toBe('text');
+      expect(ctx.accepts(['png', 'html'])).toBe('html');
+    });
+  });
 
   describe('when multiple arguments are given', () => {
     it('should return the first match', () => {

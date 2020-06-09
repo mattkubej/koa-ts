@@ -240,8 +240,12 @@ export default class Context {
     return this.request.acceptsCharsets(...args);
   }
 
-  public accepts(...args: string[]): string | false | string[] {
-    return this.request.accepts(...args);
+  public accepts(types?: string | string[], ...args: string[]): string | string[] | false {
+    if (Array.isArray(types)) {
+      return this.accept.types(types);
+    } else {
+      return this.accept.types(types, ...args);
+    }
   }
 
   public get(field: string): string | string[] {

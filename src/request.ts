@@ -251,8 +251,12 @@ export default class Request {
     this._accept = obj;
   }
 
-  accepts(...args: string[]): string | string[] | false {
-    return this.accept.types(...args);
+  accepts(types?: string | string[], ...args: string[]): string | string[] | false {
+    if (Array.isArray(types)) {
+      return this.accept.types(types);
+    } else {
+      return this.accept.types(types, ...args);
+    }
   }
 
   acceptsEncodings(...args: string[]): string | false {
