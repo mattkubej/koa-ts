@@ -15,5 +15,5 @@ const context = (req?: http.IncomingMessage, res?: http.ServerResponse, app?: Ko
 };
 
 export default context;
-export const request = (req: http.IncomingMessage, res: http.ServerResponse, app: Koa) => context(req, res, app).request;
+export const request = (req?: http.IncomingMessage, res?: http.ServerResponse, app?: Koa) => context(req, res, app).request;
 export const response = (req: http.IncomingMessage, res: http.ServerResponse, app: Koa) => context(req, res, app).response;
