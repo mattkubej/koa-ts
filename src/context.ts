@@ -228,8 +228,12 @@ export default class Context {
 
   /* Request delegation */
 
-  public acceptLanguages(...args: string[]): string | false {
-    return this.request.acceptsLanguages(...args);
+  public acceptsLanguages(languages?: string | string[], ...args: string[]): string | string[] | false {
+    if (Array.isArray(languages)) {
+      return this.request.acceptsLanguages(languages);
+    } else {
+      return this.request.acceptsLanguages(languages, ...args);
+    }
   }
 
   public acceptsEncodings(encodings?: string | string[], ...args: string[]): string | string[] | false {

@@ -275,8 +275,12 @@ export default class Request {
     }
   }
 
-  acceptsLanguages(...args: string[]): string | false {
-    return this.accept.languages(...args);
+  acceptsLanguages(languages?: string | string[], ...args: string[]): string | string[] | false {
+    if (Array.isArray(languages)) {
+      return this.accept.languages(languages);
+    } else {
+      return this.accept.languages(languages, ...args);
+    }
   }
 
   /**
