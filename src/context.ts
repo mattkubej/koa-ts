@@ -232,8 +232,12 @@ export default class Context {
     return this.request.acceptsLanguages(...args);
   }
 
-  public acceptsEncodings(...args: string[]): string | false {
-    return this.request.acceptsEncodings(...args);
+  public acceptsEncodings(encodings?: string | string[], ...args: string[]): string | string[] | false {
+    if (Array.isArray(encodings)) {
+      return this.request.acceptsEncodings(encodings);
+    } else {
+      return this.request.acceptsEncodings(encodings, ...args);
+    }
   }
 
   public acceptsCharsets(charsets?: string | string[], ...args: string[]): string | string[] | false {

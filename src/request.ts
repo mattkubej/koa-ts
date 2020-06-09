@@ -259,8 +259,12 @@ export default class Request {
     }
   }
 
-  acceptsEncodings(...args: string[]): string | false {
-    return this.accept.encodings(...args);
+  acceptsEncodings(encodings?: string | string[], ...args: string[]): string | string[] | false {
+    if (Array.isArray(encodings)) {
+      return this.accept.encodings(encodings);
+    } else {
+      return this.accept.encodings(encodings, ...args);
+    }
   }
 
   acceptsCharsets(charsets?: string | string[], ...args: string[]): string | string[] | false {
