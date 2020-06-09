@@ -236,8 +236,12 @@ export default class Context {
     return this.request.acceptsEncodings(...args);
   }
 
-  public acceptsCharsets(...args: string[]): string | false {
-    return this.request.acceptsCharsets(...args);
+  public acceptsCharsets(charsets?: string | string[], ...args: string[]): string | string[] | false {
+    if (Array.isArray(charsets)) {
+      return this.request.acceptsCharsets(charsets);
+    } else {
+      return this.request.acceptsCharsets(charsets, ...args);
+    }
   }
 
   public accepts(types?: string | string[], ...args: string[]): string | string[] | false {
