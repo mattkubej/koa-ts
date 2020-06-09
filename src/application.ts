@@ -50,9 +50,9 @@ export default class Application extends EventEmitter {
   public middleware: any[];
   public static HttpError: HttpErrorConstructor = HttpError;
 
-  //public context: Context;
-  //public request: Request;
-  //public response: Response;
+  public context: Context;
+  public request: Request;
+  public response: Response;
 
   constructor(options: Options = {}) {
     super()
@@ -64,9 +64,9 @@ export default class Application extends EventEmitter {
     if (options.keys) this.keys = options.keys;
     this.middleware = [];
     
-    //this.context = new Context();
-    //this.request = new Request();
-    //this.response = new Response();
+    this.context = new Context();
+    this.request = new Request();
+    this.response = new Response();
 
     if (util.inspect.custom) {
       this[util.inspect.custom] = this.inspect;
@@ -127,9 +127,9 @@ export default class Application extends EventEmitter {
   }
 
   createContext(req: http.IncomingMessage, res: http.ServerResponse) {
-    const context = new Context();
-    const request = context.request = new Request();
-    const response = context.response = new Response();
+    const context = Object.create(this.context);
+    const request = context.request = Object.create(this.request);
+    const response = context.response = Object.create(this.response);
     context.app = request.app = response.app = this;
     context.req = request.req = response.req = req;
     context.res = request.res = response.res = res;
