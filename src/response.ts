@@ -248,7 +248,7 @@ export default class Response {
   }
 
   // TODO: why in the original implementation was field potentially an array?
-  set(field: string | object, val?: string | number | string[] | undefined) {
+  set(field: string | object, val?: string | number | string[]) {
     if (this.headerSent) return;
 
     if (typeof field === 'object') {
