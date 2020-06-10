@@ -185,7 +185,7 @@ export default class Response {
    * @api public
    */
 
-  attachment(filename: string, options: contentDisposition.Options) {
+  attachment(filename: string, options?: contentDisposition.Options) {
     if (filename) this.type = extname(filename);
     this.set('Content-Disposition', contentDisposition(filename, options));
   }

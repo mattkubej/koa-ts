@@ -130,7 +130,7 @@ export default class Context {
 
   /* Response delegation */
 
-  public attachment(filename: string, options: contentDisposition.Options) {
+  public attachment(filename: string, options?: contentDisposition.Options) {
     this.response.attachment(filename, options);
   }
 
