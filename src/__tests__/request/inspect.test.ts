@@ -1,5 +1,4 @@
 import { request } from '../helpers/context';
-import util from 'util';
 
 describe('req.inspect()', () => {
   describe('with no request.req present', () => {
