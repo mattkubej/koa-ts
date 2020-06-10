@@ -62,12 +62,12 @@ export default class Response {
     assert(code >= 100 && code <= 999, `invalid status code: ${code}`);
     this._explicitStatus = true;
     this.res.statusCode = code;
-    if (this.req.httpVersionMajor < 2) this.res.statusMessage = statuses[code];
+    if (this.req.httpVersionMajor < 2) this.res.statusMessage = statuses.message[code];
     if (this.body && statuses.empty[code]) this.body = null;
   }
 
   get message(): string {
-    return this.res.statusMessage || statuses[this.status];
+    return this.res.statusMessage || statuses.message[this.status];
   }
 
   set message(msg: string) {
