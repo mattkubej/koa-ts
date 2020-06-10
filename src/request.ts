@@ -200,7 +200,7 @@ export default class Request {
 
   get protocol(): string {
     // TODO: not sure if this is right
-    if (this.socket instanceof TLSSocket) return 'https';
+    if ((this.socket as TLSSocket).encrypted) return 'https';
     if (!this.app.proxy) return 'http';
     const proto = <string> this.get('X-Forwarded-Proto');
     return proto ? proto.split(/\s*,\s*/, 1)[0] : 'http';
