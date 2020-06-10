@@ -243,10 +243,7 @@ export default class Response {
   }
 
   has(field: string): boolean {
-    return typeof this.res.hasHeader === 'function'
-      ? this.res.hasHeader(field)
-      // Node < 7.7
-      : field.toLowerCase() in this.headers;
+    return this.res.hasHeader(field);
   }
 
   // TODO: why in the original implementation was field potentially an array?
