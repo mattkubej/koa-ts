@@ -73,7 +73,7 @@ export default class Application extends EventEmitter {
     }
   }
 
-  listen(...args: any[]) {
+  listen(...args: any[]): http.Server {
     debug('listen');
     const server = http.createServer(this.callback());
     return server.listen(...args);
