@@ -40,6 +40,7 @@
     "depd": "2.0.0",
     "destroy": "1.0.4",
     "encodeurl": "1.0.2",
+    "escape-html": "1.0.3",
     "fresh": "0.5.2",
     "http-assert": "1.4.1",
     "http-errors": "1.7.3",

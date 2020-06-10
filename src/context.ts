@@ -134,7 +134,7 @@ export default class Context {
     this.response.attachment(filename, options);
   }
 
-  public redirect(url: string, alt: string) {
+  public redirect(url: string, alt?: string) {
     this.response.redirect(url, alt);
   }
 

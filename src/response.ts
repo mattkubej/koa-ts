@@ -12,6 +12,7 @@ import Stream from 'stream';
 import destroy from 'destroy';
 import onFinish from 'on-finished';
 import encodeUrl from 'encodeurl';
+import escape from 'escape-html';
 
 import only from './utils/only';
 
@@ -157,7 +158,7 @@ export default class Response {
     vary(this.res, field);
   }
 
-  redirect(url: string, alt: string) {
+  redirect(url: string, alt?: string) {
     // location
     if ('back' === url) url = <string> this.ctx.get('Referrer') || alt || '/';
     this.set('Location', encodeUrl(url));
