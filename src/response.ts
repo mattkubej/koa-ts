@@ -40,8 +40,9 @@ export default class Response {
   private _body: any;
   private _explicitStatus: boolean;
 
+  // Note: was this a bug? originally returned this.res.socket
   get socket(): Socket {
-    return this.res.socket;
+    return this.req.socket;
   }
 
   get header(): http.OutgoingHttpHeaders {
