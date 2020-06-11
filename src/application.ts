@@ -19,6 +19,7 @@ import Request from './request';
 import Response from './response';
 
 import only from './utils/only';
+import isError from './utils/isError';
 
 export class KoaError extends Error {
   expose?: boolean;
@@ -141,10 +142,8 @@ export default class Application extends EventEmitter {
     return context;
   }
 
-  onerror(err: KoaError | string) {
-    // SystemError returned from stream errors
-    // fails the instanceof Error check
-    if (!(err instanceof Error || typeof err === 'object')) {
+  onerror(err: any) {
+    if (!isError(err)) {
       throw new TypeError(util.format('non-error thrown: %j', err));
     }
 

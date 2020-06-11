@@ -10,6 +10,7 @@ import accepts from 'accepts';
 import Application from './application';
 import Request from './request';
 import Response from './response';
+import isError from './utils/isError';
 
 import contentDisposition from 'content-disposition';
 
@@ -62,7 +63,7 @@ export default class Context {
 
     // SystemError returned from stream errors
     // fails the instanceof Error check
-    if (!(err instanceof Error || typeof err === 'object')) {
+    if (!isError(err)) {
       err = new Error(util.format('non-error thrown: %j', err));
     }
 
@@ -95,9 +96,8 @@ export default class Context {
       //res._headers = {}; // Node < 7.7
     //}
 
-    // TODO: where is set defined and what is the purpose of this?
-    // then set those specified
-    //this.set(err.headers);
+    // Note: previously no guard here
+    if (err.headers) this.set(err.headers);
 
     // force text/plain
     this.type = 'text';
@@ -154,7 +154,7 @@ export default class Context {
     return this.response.has(field);
   }
 
-  public set(field: string | object | string[], val: string | number) {
+  public set(field: string | object | string[], val?: string | number) {
     this.response.set(field, val);
   }
 

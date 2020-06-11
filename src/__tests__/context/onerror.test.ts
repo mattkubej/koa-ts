@@ -45,34 +45,34 @@ describe('ctx.onerror(err)', () => {
     expect(res.headers.hasOwnProperty('x-csrf-token')).toBeFalsy();
   });
 
-  //it('should set headers specified in the error', async() => {
-    //const app = new Koa();
+  it('should set headers specified in the error', async() => {
+    const app = new Koa();
 
-    //app.use((ctx: Context) => {
-      //ctx.set('Vary', 'Accept-Encoding');
-      //ctx.set('X-CSRF-Token', 'asdf');
-      //ctx.body = 'response';
+    app.use((ctx: Context) => {
+      ctx.set('Vary', 'Accept-Encoding');
+      ctx.set('X-CSRF-Token', 'asdf');
+      ctx.body = 'response';
 
-      //throw Object.assign(new Error('boom'), {
-        //status: 418,
-        //expose: true,
-        //headers: {
-          //'X-New-Header': 'Value'
-        //}
-      //});
-    //});
+      throw Object.assign(new Error('boom'), {
+        status: 418,
+        expose: true,
+        headers: {
+          'X-New-Header': 'Value'
+        }
+      });
+    });
 
-    //const server = app.listen();
+    const server = app.listen();
 
-    //const res = await request(server)
-      //.get('/')
-      //.expect(418)
-      //.expect('Content-Type', 'text/plain; charset=utf-8')
-      //.expect('X-New-Header', 'Value');
+    const res = await request(server)
+      .get('/')
+      .expect(418)
+      .expect('Content-Type', 'text/plain; charset=utf-8')
+      .expect('X-New-Header', 'Value');
 
-    //expect(res.headers.hasOwnProperty('vary')).toBeFalsy();
-    //expect(res.headers.hasOwnProperty('x-csrf-token')).toBeFalsy();
-  //});
+    expect(res.headers.hasOwnProperty('vary')).toBeFalsy();
+    expect(res.headers.hasOwnProperty('x-csrf-token')).toBeFalsy();
+  });
 
   it('should ignore error after headerSent', done => {
     const app = new Koa();
@@ -219,39 +219,39 @@ describe('ctx.onerror(err)', () => {
         .expect('Internal Server Error');
     });
 
-    //it('should use res.getHeaderNames() accessor when available', () => {
-      //let removed = 0;
-      //const ctx = context();
+    it('should use res.getHeaderNames() accessor when available', () => {
+      let removed = 0;
+      const ctx = context();
 
-      //ctx.app.emit = () => {};
-      //ctx.res = {
-        //getHeaderNames: () => ['content-type', 'content-length'],
-        //removeHeader: () => removed++,
-        //end: () => {},
-        //emit: () => {}
-      //};
+      ctx.app.emit = () => {};
+      ctx.res = {
+        getHeaderNames: () => ['content-type', 'content-length'],
+        removeHeader: () => removed++,
+        end: () => {},
+        emit: () => {}
+      };
 
-      //ctx.onerror(new Error('error'));
+      ctx.onerror(new Error('error'));
 
-      //expect(removed).toBe(2);
-    //});
+      expect(removed).toBe(2);
+    });
 
-    //it('should stringify error if it is an object', done => {
-      //const app = new Koa();
+    it('should stringify error if it is an object', done => {
+      const app = new Koa();
 
-      //app.on('error', err => {
-        //expect(err).toBe('Error: non-error thrown: {"key":"value"}');
-        //done();
-      //});
+      app.on('error', err => {
+        expect(err).toMatchObject(new Error('non-error thrown: {"key":"value"}'));
+        done();
+      });
 
-      //app.use(() => {
-        //throw {key: 'value'}; // eslint-disable-line no-throw-literal
-      //});
+      app.use(() => {
+        throw {key: 'value'}; // eslint-disable-line no-throw-literal
+      });
 
-      //request(app.callback())
-        //.get('/')
-        //.expect(500)
-        //.expect('Internal Server Error', () => {});
-    //});
+      request(app.callback())
+        .get('/')
+        .expect(500)
+        .expect('Internal Server Error', () => {});
+    });
   });
 });
