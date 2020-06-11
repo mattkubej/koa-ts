@@ -610,7 +610,7 @@ describe('app.respond', () => {
           .get('/')
           .expect('Content-Type', 'application/json; charset=utf-8');
 
-        const pkg = require('../../package');
+        const pkg = require('../../../package');
         expect(res.headers.hasOwnProperty('content-length')).toBeTruthy();
         expect(res.body).toStrictEqual(pkg);
       });
