@@ -1,11 +1,6 @@
-import Koa, { KoaError } from '../../application';
-import Response from '../../response';
-import Context from '../../context';
 import request from 'supertest';
-import util from 'util';
-import mm from 'mm';
-import fs from 'fs';
-import statuses from 'statuses';
+import Koa from '../../application';
+import Context from '../../context';
 
 describe('app', () => {
   it('should handle socket errors', done => {
