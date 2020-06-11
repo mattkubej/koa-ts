@@ -142,7 +142,11 @@ export default class Application extends EventEmitter {
   }
 
   onerror(err: KoaError | string) {
-    if (!(err instanceof Error)) throw new TypeError(util.format('non-error thrown: %j', err));
+    // SystemError returned from stream errors
+    // fails the instanceof Error check
+    if (!(err instanceof Error || typeof err === 'object')) {
+      throw new TypeError(util.format('non-error thrown: %j', err));
+    }
 
     // not sure what err.expose is
     if (404 === err.status || err.expose) return;

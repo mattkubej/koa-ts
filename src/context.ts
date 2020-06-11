@@ -60,7 +60,11 @@ export default class Context {
     // to node-style callbacks.
     if (null == err) return;
 
-    if (!(err instanceof Error)) err = new Error(util.format('non-error thrown: %j', err));
+    // SystemError returned from stream errors
+    // fails the instanceof Error check
+    if (!(err instanceof Error || typeof err === 'object')) {
+      err = new Error(util.format('non-error thrown: %j', err));
+    }
 
     let headerSent = false;
     if (this.headerSent || !this.writable) {
