@@ -35,7 +35,7 @@ export default class Context {
     this.assert = httpAssert;
   }
 
-  toJSON() {
+  toJSON(): object {
     return {
       request: this.request.toJSON(),
       response: this.response.toJSON(),
@@ -47,7 +47,7 @@ export default class Context {
     };
   }
 
-  inspect() {
+  inspect(): object {
     return this.toJSON();
   }
 
@@ -118,7 +118,7 @@ export default class Context {
     res.end(msg);
   }
 
-  get cookies() {
+  get cookies(): Cookies {
     if (!this[COOKIES]) {
       this[COOKIES] = new Cookies(this.req, this.res, {
         keys: this.app.keys,
