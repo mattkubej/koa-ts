@@ -1,0 +1,4 @@
+{
+  "extends": ["koa", "plugin:jest/recommended"],
+  "plugins": ["jest"]
+}

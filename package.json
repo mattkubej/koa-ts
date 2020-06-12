@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "build": "tsc",
-    "test": "jest"
+    "test": "jest",
+    "lint": "eslint --ext .ts src"
   },
   "keywords": [],
   "author": "",
@@ -56,6 +57,16 @@
   },
   "devDependencies": {
     "@types/jest": "25.2.3",
+    "@typescript-eslint/eslint-plugin": "3.2.0",
+    "@typescript-eslint/parser": "3.2.0",
+    "eslint": "7.2.0",
+    "eslint-config-koa": "2.0.2",
+    "eslint-config-standard": "14.1.1",
+    "eslint-plugin-import": "2.21.2",
+    "eslint-plugin-jest": "23.13.2",
+    "eslint-plugin-node": "11.1.0",
+    "eslint-plugin-promise": "4.2.1",
+    "eslint-plugin-standard": "4.0.1",
     "jest": "26.0.1",
     "mm": "3.2.0",
     "statuses": "2.0.0",
