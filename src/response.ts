@@ -20,7 +20,7 @@ import Application from './application';
 import Context from './context';
 import Request from './request';
 
-type ResponseJSON = {
+export type ResponseJSON = {
   status?: any;
   message?: any;
   header?: any;

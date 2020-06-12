@@ -9,7 +9,7 @@ import accepts from 'accepts';
 
 import Application, { ApplicationJSON } from './application';
 import Request, { RequestJSON } from './request';
-import Response from './response';
+import Response, { ResponseJSON } from './response';
 import isError from './utils/isError';
 
 import contentDisposition from 'content-disposition';
@@ -18,7 +18,7 @@ const COOKIES = Symbol('context#cookies');
 
 type ContextJSON = {
   request: RequestJSON;
-  response: any;
+  response: ResponseJSON;
   app: ApplicationJSON;
   originalUrl: string;
   req: string;
