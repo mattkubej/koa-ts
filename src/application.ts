@@ -37,8 +37,6 @@ type Options = {
   keys?: any; // TODO: what type is this?
 };
 
-type HandleRequestFn = (req: http.IncomingMessage, res: http.ServerResponse) => HandleRequestFn; 
-
 export default class Application extends EventEmitter {
 
   public silent: boolean;
@@ -82,7 +80,7 @@ export default class Application extends EventEmitter {
     return server.listen(...args);
   }
 
-  toJSON(): object {
+  toJSON() {
     return only(this, [
       'subdomainOffset',
       'proxy',
@@ -90,11 +88,11 @@ export default class Application extends EventEmitter {
     ]);
   }
 
-  inspect(): object {
+  inspect() {
     return this.toJSON();
   }
 
-  use(fn: Function): Application {
+  use(fn: Function) {
     if (typeof fn !== 'function') throw new TypeError('middleware must be a function!');
     if (isGeneratorFunction(fn)) {
       deprecate('Support for generators will be removed in v3. ' +
@@ -107,7 +105,7 @@ export default class Application extends EventEmitter {
     return this;
   }
 
-  callback(): HandleRequestFn {
+  callback() {
     const fn = compose(this.middleware);
 
     if (!this.listenerCount('error')) this.on('error', this.onerror);
@@ -129,7 +127,7 @@ export default class Application extends EventEmitter {
     return fnMiddleware(ctx).then(handleResponse).catch(onerror);
   }
 
-  createContext(req: http.IncomingMessage, res: http.ServerResponse): Context {
+  createContext(req: http.IncomingMessage, res: http.ServerResponse) {
     const context = Object.create(this.context);
     const request = context.request = Object.create(this.request);
     const response = context.response = Object.create(this.response);
