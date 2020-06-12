@@ -18,6 +18,12 @@ import Response from './response';
 
 const IP = Symbol('context#ip');
 
+export type RequestJSON = {
+  method: string;
+  url: string;
+  header: object;
+}
+
 export default class Request {
 
   public req: http.IncomingMessage;
@@ -331,17 +337,17 @@ export default class Request {
     }
   }
 
-  inspect(): object {
+  inspect(): RequestJSON {
     if (!this.req) return;
     return this.toJSON();
   }
 
-  toJSON(): object {
+  toJSON(): RequestJSON {
     return only(this, [
       'method',
       'url',
       'header'
-    ]);
+    ]) as RequestJSON;
   }
 }
 
