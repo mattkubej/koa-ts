@@ -138,7 +138,7 @@ export default class Context {
     return this[COOKIES];
   }
 
-  set cookies(_cookies) {
+  set cookies(_cookies: Cookies) {
     this[COOKIES] = _cookies;
   }
 
