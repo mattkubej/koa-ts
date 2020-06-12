@@ -38,9 +38,9 @@ type Options = {
 };
 
 export type ApplicationJSON = {
-  subdomainOffset: number;
-  proxy: boolean;
-  env: string;
+  subdomainOffset?: number;
+  proxy?: boolean;
+  env?: string;
 };
 
 type HandleRequestFn = (req: http.IncomingMessage, res: http.ServerResponse) => HandleRequestFn;
@@ -93,7 +93,7 @@ export default class Application extends EventEmitter {
       'subdomainOffset',
       'proxy',
       'env'
-    ]) as ApplicationJSON;
+    ]);
   }
 
   inspect(): ApplicationJSON {
