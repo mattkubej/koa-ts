@@ -43,6 +43,8 @@ type ApplicationJSON = {
   env: string;
 };
 
+type HandleRequestFn = (req: http.IncomingMessage, res: http.ServerResponse) => HandleRequestFn;
+
 export default class Application extends EventEmitter {
 
   public silent: boolean;
@@ -111,7 +113,7 @@ export default class Application extends EventEmitter {
     return this;
   }
 
-  callback() {
+  callback(): HandleRequestFn {
     const fn = compose(this.middleware);
 
     if (!this.listenerCount('error')) this.on('error', this.onerror);
