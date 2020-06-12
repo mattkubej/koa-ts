@@ -135,7 +135,7 @@ export default class Application extends EventEmitter {
     return fnMiddleware(ctx).then(handleResponse).catch(onerror);
   }
 
-  createContext(req: http.IncomingMessage, res: http.ServerResponse) {
+  createContext(req: http.IncomingMessage, res: http.ServerResponse): Context {
     const context = Object.create(this.context);
     const request = context.request = Object.create(this.request);
     const response = context.response = Object.create(this.response);
