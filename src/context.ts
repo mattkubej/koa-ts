@@ -57,7 +57,7 @@ export default class Context {
     };
   }
 
-  inspect() {
+  inspect(): ContextJSON {
     return this.toJSON();
   }
 
