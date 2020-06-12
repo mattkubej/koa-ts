@@ -37,7 +37,7 @@ type Options = {
   keys?: any; // TODO: what type is this?
 };
 
-type ApplicationJSON = {
+export type ApplicationJSON = {
   subdomainOffset: number;
   proxy: boolean;
   env: string;

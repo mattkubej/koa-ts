@@ -7,7 +7,7 @@ import util from 'util';
 import { Socket } from "net";
 import accepts from 'accepts';
 
-import Application from './application';
+import Application, { ApplicationJSON } from './application';
 import Request from './request';
 import Response from './response';
 import isError from './utils/isError';
@@ -15,6 +15,16 @@ import isError from './utils/isError';
 import contentDisposition from 'content-disposition';
 
 const COOKIES = Symbol('context#cookies');
+
+type ContextJSON = {
+  request: any;
+  response: any;
+  app: ApplicationJSON;
+  originalUrl: string;
+  req: string;
+  res: string;
+  socket: string;
+};
 
 export default class Context {
 
@@ -35,13 +45,13 @@ export default class Context {
     this.assert = httpAssert;
   }
 
-  toJSON() {
+  toJSON(): ContextJSON {
     return {
       request: this.request.toJSON(),
       response: this.response.toJSON(),
       app: this.app.toJSON(),
       originalUrl: this.originalUrl,
-      req: '<original node req>',
+      req: '<original node req>', // TODO: why return strings here?
       res: '<original node res>',
       socket: '<original node socket>'
     };
