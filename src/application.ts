@@ -94,7 +94,7 @@ export default class Application extends EventEmitter {
     ]) as ApplicationJSON;
   }
 
-  inspect() {
+  inspect(): ApplicationJSON {
     return this.toJSON();
   }
 
