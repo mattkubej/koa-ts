@@ -37,6 +37,12 @@ type Options = {
   keys?: any; // TODO: what type is this?
 };
 
+type ApplicationJSON = {
+  subdomainOffset: number;
+  proxy: boolean;
+  env: string;
+};
+
 export default class Application extends EventEmitter {
 
   public silent: boolean;
@@ -80,12 +86,12 @@ export default class Application extends EventEmitter {
     return server.listen(...args);
   }
 
-  toJSON() {
+  toJSON(): ApplicationJSON {
     return only(this, [
       'subdomainOffset',
       'proxy',
       'env'
-    ]);
+    ]) as ApplicationJSON;
   }
 
   inspect() {
