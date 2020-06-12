@@ -98,7 +98,7 @@ export default class Application extends EventEmitter {
     return this.toJSON();
   }
 
-  use(fn: Function) {
+  use(fn: Function): Application {
     if (typeof fn !== 'function') throw new TypeError('middleware must be a function!');
     if (isGeneratorFunction(fn)) {
       deprecate('Support for generators will be removed in v3. ' +
