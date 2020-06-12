@@ -126,7 +126,7 @@ export default class Application extends EventEmitter {
     return handleRequest;
   }
 
-  handleRequest(ctx: Context, fnMiddleware: Function) {
+  handleRequest(ctx: Context, fnMiddleware: Function): HandleRequestFn {
     const res = ctx.res;
     res.statusCode = 404;
     const onerror = (err: any) => ctx.onerror(err);
