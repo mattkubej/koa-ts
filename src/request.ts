@@ -19,9 +19,9 @@ import Response from './response';
 const IP = Symbol('context#ip');
 
 export type RequestJSON = {
-  method: string;
-  url: string;
-  header: object;
+  method?: string;
+  url?: string;
+  header?: object;
 }
 
 export default class Request {
@@ -347,7 +347,7 @@ export default class Request {
       'method',
       'url',
       'header'
-    ]) as RequestJSON;
+    ]);
   }
 }
 
