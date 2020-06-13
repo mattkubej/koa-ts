@@ -163,7 +163,7 @@ export default class Context {
     return this.response.has(field);
   }
 
-  public set(field: string | object | string[], val?: string | number) {
+  public set(field: string | object | string[], val?: string | number | string[]) {
     this.response.set(field, val);
   }
 
