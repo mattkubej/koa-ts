@@ -96,7 +96,7 @@ describe('ctx.cookies', () => {
       const app = new Koa();
 
       app.use((ctx: Context) => {
-        ctx.cookies = {
+        (ctx as any).cookies = {
           set(key: string, value: string) {
             ctx.set(key, value);
           }
