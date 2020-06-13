@@ -1,5 +1,13 @@
 {
   "extends": ["koa", "plugin:jest/recommended"],
   "parser": "@typescript-eslint/parser",
-  "plugins": ["@typescript-eslint", "jest"]
+  "plugins": ["@typescript-eslint", "jest"],
+  "overrides": [
+    {
+      "files": ["*.ts"],
+      "rules": {
+        "@typescript-eslint/no-unused-vars": [2, { "args": "none" }]
+      }
+    }
+  ]
 }

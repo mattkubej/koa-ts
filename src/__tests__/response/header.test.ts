@@ -14,7 +14,7 @@ describe('res.header', () => {
 
   it('should use res.getHeaders() accessor when available', () => {
     const res = response();
-    res.res._headers = null;
+    (res.res as any)._headers = null;
     res.res.getHeaders = () => ({ 'x-foo': 'baz' });
     expect(res.header).toMatchObject({ 'x-foo': 'baz' });
   });
@@ -37,7 +37,7 @@ describe('res.header', () => {
   describe('when res._headers not present', () => {
     it('should return empty object', () => {
       const res = response();
-      res.res._headers = null;
+      (res.res as any)._headers = null;
       expect(res.header).toMatchObject({});
     });
   });
