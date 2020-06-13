@@ -314,9 +314,12 @@ export default class Request {
    * @return {String|false|null}
    * @api public
    */
-
-  is(type: string, ...types: string[]): string | false | null {
-    return typeis(this.req, type, ...types);
+  is(type?: string | string[], ...types: string[]): string | false {
+    if (Array.isArray(type)) {
+      return typeis(this.req, type);
+    } else {
+      return typeis(this.req, type, ...types);
+    }
   }
 
   get type(): string {

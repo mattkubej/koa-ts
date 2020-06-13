@@ -277,8 +277,12 @@ export default class Context {
     return this.request.get(field);
   }
 
-  public is(type: string, ...types: string[]): string | false | null {
-    return this.request.is(type, ...types);
+  public is(type?: string | string[], ...types: string[]): string | false | null {
+    if (Array.isArray(type)) {
+      return this.request.is(type);
+    } else {
+      return this.request.is(type, ...types);
+    }
   }
 
   // TODO: types
