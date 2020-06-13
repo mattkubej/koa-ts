@@ -41,8 +41,8 @@ describe('ctx.onerror(err)', () => {
       .expect('Content-Type', 'text/plain; charset=utf-8')
       .expect('Content-Length', '4');
 
-    expect(res.headers.hasOwnProperty('vary')).toBeFalsy();
-    expect(res.headers.hasOwnProperty('x-csrf-token')).toBeFalsy();
+    expect(Object.prototype.hasOwnProperty.call(res.headers, 'vary')).toBeFalsy();
+    expect(Object.prototype.hasOwnProperty.call(res.headers, 'x-csrf-token')).toBeFalsy();
   });
 
   it('should set headers specified in the error', async() => {
@@ -70,18 +70,18 @@ describe('ctx.onerror(err)', () => {
       .expect('Content-Type', 'text/plain; charset=utf-8')
       .expect('X-New-Header', 'Value');
 
-    expect(res.headers.hasOwnProperty('vary')).toBeFalsy();
-    expect(res.headers.hasOwnProperty('x-csrf-token')).toBeFalsy();
+    expect(Object.prototype.hasOwnProperty.call(res.headers, 'vary')).toBeFalsy();
+    expect(Object.prototype.hasOwnProperty.call(res.headers, 'x-csrf-token')).toBeFalsy();
   });
 
   it('should ignore error after headerSent', () => {
-    return new Promise(done => {
+    return new Promise(resolve => {
       const app = new Koa();
 
       app.on('error', err => {
         expect(err.message).toBe('mock error');
         expect(err.headerSent).toBeTruthy();
-        done();
+        resolve();
       });
 
       app.use(async(ctx: Context) => {
@@ -225,13 +225,13 @@ describe('ctx.onerror(err)', () => {
       let removed = 0;
       const ctx = context();
 
-      ctx.app.emit = () => {};
+      ctx.app.emit = () => false;
       ctx.res = {
         getHeaderNames: () => ['content-type', 'content-length'],
         removeHeader: () => removed++,
         end: () => {},
-        emit: () => {}
-      };
+        emit: () => false
+      } as any;
 
       ctx.onerror(new Error('error'));
 
@@ -239,12 +239,12 @@ describe('ctx.onerror(err)', () => {
     });
 
     it('should stringify error if it is an object', () => {
-      return new Promise(done => {
+      return new Promise(resolve => {
         const app = new Koa();
 
         app.on('error', err => {
           expect(err).toMatchObject(new Error('non-error thrown: {"key":"value"}'));
-          done();
+          resolve();
         });
 
         app.use(() => {
