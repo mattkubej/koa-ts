@@ -1,4 +1,5 @@
 {
   "extends": ["koa", "plugin:jest/recommended"],
-  "plugins": ["jest"]
+  "parser": "@typescript-eslint/parser",
+  "plugins": ["@typescript-eslint", "jest"]
 }
