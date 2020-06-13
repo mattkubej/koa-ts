@@ -51,29 +51,26 @@ describe('contentDisposition(filename, options)', () => {
   describe('with "fallback" option', () => {
     it('should require a string or Boolean', () => {
       const ctx = context();
-      expect(() => { ctx.attachment('plans.pdf', { fallback: 42 }); }).toThrow(/fallback.*string/);
+      expect(() => { ctx.attachment('plans.pdf', { fallback: 42 } as any); }).toThrow(/fallback.*string/);
     });
 
     it('should default to true', () => {
       const ctx = context();
       ctx.attachment('€ rates.pdf');
-      expect(ctx.response.header['content-disposition']).toBe
-      ('attachment; filename="? rates.pdf"; filename*=UTF-8\'\'%E2%82%AC%20rates.pdf');
+      expect(ctx.response.header['content-disposition']).toBe('attachment; filename="? rates.pdf"; filename*=UTF-8\'\'%E2%82%AC%20rates.pdf');
     });
 
     describe('when "false"', () => {
       it('should not generate ISO-8859-1 fallback', () => {
         const ctx = context();
         ctx.attachment('£ and € rates.pdf', { fallback: false });
-        expect(ctx.response.header['content-disposition']).toBe
-        ('attachment; filename*=UTF-8\'\'%C2%A3%20and%20%E2%82%AC%20rates.pdf');
+        expect(ctx.response.header['content-disposition']).toBe('attachment; filename*=UTF-8\'\'%C2%A3%20and%20%E2%82%AC%20rates.pdf');
       });
 
       it('should keep ISO-8859-1 filename', () => {
         const ctx = context();
         ctx.attachment('£ rates.pdf', { fallback: false });
-        expect(ctx.response.header['content-disposition']).toBe
-        ('attachment; filename="£ rates.pdf"');
+        expect(ctx.response.header['content-disposition']).toBe('attachment; filename="£ rates.pdf"');
       });
     });
 
@@ -81,15 +78,13 @@ describe('contentDisposition(filename, options)', () => {
       it('should generate ISO-8859-1 fallback', () => {
         const ctx = context();
         ctx.attachment('£ and € rates.pdf', { fallback: true });
-        expect(ctx.response.header['content-disposition']).toBe
-        ('attachment; filename="£ and ? rates.pdf"; filename*=UTF-8\'\'%C2%A3%20and%20%E2%82%AC%20rates.pdf');
+        expect(ctx.response.header['content-disposition']).toBe('attachment; filename="£ and ? rates.pdf"; filename*=UTF-8\'\'%C2%A3%20and%20%E2%82%AC%20rates.pdf');
       });
 
       it('should pass through ISO-8859-1 filename', () => {
         const ctx = context();
         ctx.attachment('£ rates.pdf', { fallback: true });
-        expect(ctx.response.header['content-disposition']).toBe
-        ('attachment; filename="£ rates.pdf"');
+        expect(ctx.response.header['content-disposition']).toBe('attachment; filename="£ rates.pdf"');
       });
     });
 
@@ -102,36 +97,31 @@ describe('contentDisposition(filename, options)', () => {
       it('should use as ISO-8859-1 fallback', () => {
         const ctx = context();
         ctx.attachment('£ and € rates.pdf', { fallback: '£ and EURO rates.pdf' });
-        expect(ctx.response.header['content-disposition']).toBe
-        ('attachment; filename="£ and EURO rates.pdf"; filename*=UTF-8\'\'%C2%A3%20and%20%E2%82%AC%20rates.pdf');
+        expect(ctx.response.header['content-disposition']).toBe('attachment; filename="£ and EURO rates.pdf"; filename*=UTF-8\'\'%C2%A3%20and%20%E2%82%AC%20rates.pdf');
       });
 
       it('should use as fallback even when filename is ISO-8859-1', () => {
         const ctx = context();
         ctx.attachment('"£ rates".pdf', { fallback: '£ rates.pdf' });
-        expect(ctx.response.header['content-disposition']).toBe
-        ('attachment; filename="£ rates.pdf"; filename*=UTF-8\'\'%22%C2%A3%20rates%22.pdf');
+        expect(ctx.response.header['content-disposition']).toBe('attachment; filename="£ rates.pdf"; filename*=UTF-8\'\'%22%C2%A3%20rates%22.pdf');
       });
 
       it('should do nothing if equal to filename', () => {
         const ctx = context();
         ctx.attachment('plans.pdf', { fallback: 'plans.pdf' });
-        expect(ctx.response.header['content-disposition']).toBe
-        ('attachment; filename="plans.pdf"');
+        expect(ctx.response.header['content-disposition']).toBe('attachment; filename="plans.pdf"');
       });
 
       it('should use the basename of the string', () => {
         const ctx = context();
         ctx.attachment('€ rates.pdf', { fallback: '/path/to/EURO rates.pdf' });
-        expect(ctx.response.header['content-disposition']).toBe
-        ('attachment; filename="EURO rates.pdf"; filename*=UTF-8\'\'%E2%82%AC%20rates.pdf');
+        expect(ctx.response.header['content-disposition']).toBe('attachment; filename="EURO rates.pdf"; filename*=UTF-8\'\'%E2%82%AC%20rates.pdf');
       });
 
       it('should do nothing without filename option', () => {
         const ctx = context();
         ctx.attachment(undefined, { fallback: 'plans.pdf' });
-        expect(ctx.response.header['content-disposition']).toBe
-        ('attachment');
+        expect(ctx.response.header['content-disposition']).toBe('attachment');
       });
     });
   });
@@ -140,13 +130,12 @@ describe('contentDisposition(filename, options)', () => {
     it('should default to attachment', () => {
       const ctx = context();
       ctx.attachment();
-      expect(ctx.response.header['content-disposition']).toBe
-      ('attachment');
+      expect(ctx.response.header['content-disposition']).toBe('attachment');
     });
 
     it('should require a string', () => {
       const ctx = context();
-      expect(() => { ctx.attachment(undefined, { type: 42 }); }).toThrow(/invalid type/);
+      expect(() => { ctx.attachment(undefined, { type: 42 } as any); }).toThrow(/invalid type/);
     });
 
     it('should require a valid type', () => {
@@ -157,22 +146,19 @@ describe('contentDisposition(filename, options)', () => {
     it('should create a header with inline type', () => {
       const ctx = context();
       ctx.attachment(undefined, { type: 'inline' });
-      expect(ctx.response.header['content-disposition']).toBe
-      ('inline');
+      expect(ctx.response.header['content-disposition']).toBe('inline');
     });
 
     it('should create a header with inline type & filename', () => {
       const ctx = context();
       ctx.attachment('plans.pdf', { type: 'inline' });
-      expect(ctx.response.header['content-disposition']).toBe
-      ('inline; filename="plans.pdf"');
+      expect(ctx.response.header['content-disposition']).toBe('inline; filename="plans.pdf"');
     });
 
     it('should normalize type', () => {
       const ctx = context();
       ctx.attachment(undefined, { type: 'INLINE' });
-      expect(ctx.response.header['content-disposition']).toBe
-      ('inline');
+      expect(ctx.response.header['content-disposition']).toBe('inline');
     });
   });
 });
