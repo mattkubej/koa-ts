@@ -4,7 +4,7 @@ describe('ctx.idempotent', () => {
   describe('when the request method is idempotent', () => {
     it('should return true', () => {
       ['GET', 'HEAD', 'PUT', 'DELETE', 'OPTIONS', 'TRACE'].forEach(check);
-      function check(method: string){
+      function check(method: string) {
         const req = request();
         req.method = method;
         expect(req.idempotent).toBeTruthy();

@@ -8,7 +8,7 @@ describe('req.headers', () => {
 
   it('should set the request header object', () => {
     const req = request();
-    req.headers = {'X-Custom-Headerfield': 'Its one header, with headerfields'};
+    req.headers = { 'X-Custom-Headerfield': 'Its one header, with headerfields' };
     expect(req.headers).toStrictEqual(req.req.headers);
   });
 });

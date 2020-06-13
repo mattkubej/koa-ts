@@ -12,21 +12,23 @@ describe('ctx.redirect(url)', () => {
     expect(ctx.status).toBe(302);
   });
 
-  it('should auto fix not encode url', done => {
-    const app = new Koa();
+  it('should auto fix not encode url', () => {
+    return new Promise(done => {
+      const app = new Koa();
 
-    app.use((ctx: Context) => {
-      ctx.redirect('http://google.com/😓');
-    });
-
-    request(app.callback())
-      .get('/')
-      .end((err: Error, res: Response) => {
-        if (err) return done(err);
-        expect(res.status).toBe(302);
-        expect(res.headers.location).toBe('http://google.com/%F0%9F%98%93');
-        done();
+      app.use((ctx: Context) => {
+        ctx.redirect('http://google.com/😓');
       });
+
+      request(app.callback())
+        .get('/')
+        .end((err: Error, res: Response) => {
+          if (err) return done(err);
+          expect(res.status).toBe(302);
+          expect(res.headers.location).toBe('http://google.com/%F0%9F%98%93');
+          done();
+        });
+    });
   });
 
   describe('with "back"', () => {
@@ -126,7 +128,7 @@ describe('ctx.redirect(url)', () => {
   });
 });
 
-function escape(html: any){
+function escape(html: any) {
   return String(html)
     .replace(/&/g, '&amp;')
     .replace(/"/g, '&quot;')

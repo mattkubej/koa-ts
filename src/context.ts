@@ -4,7 +4,7 @@ import statuses from 'statuses';
 import Cookies from 'cookies';
 import http from 'http';
 import util from 'util';
-import { Socket } from "net";
+import { Socket } from 'net';
 import accepts from 'accepts';
 
 import Application, { ApplicationJSON } from './application';
@@ -27,7 +27,6 @@ type ContextJSON = {
 };
 
 export default class Context {
-
   public assert: Function;
 
   public req: http.IncomingMessage;
@@ -100,11 +99,11 @@ export default class Context {
     // original implementation
     // first unset all headers
     /* istanbul ignore else */
-    //if (typeof res.getHeaderNames === 'function') {
-      //res.getHeaderNames().forEach(name => res.removeHeader(name));
-    //} else {
-      //res._headers = {}; // Node < 7.7
-    //}
+    // if (typeof res.getHeaderNames === 'function') {
+    // res.getHeaderNames().forEach(name => res.removeHeader(name));
+    // } else {
+    // res._headers = {}; // Node < 7.7
+    // }
 
     // Note: previously no guard here
     if (err.headers) this.set(err.headers);
@@ -337,7 +336,7 @@ export default class Context {
   }
 
   set url(url: string) {
-    this.request.url = url; 
+    this.request.url = url;
   }
 
   get url(): string {

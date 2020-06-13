@@ -9,7 +9,7 @@ describe('ctx.href', () => {
       url: '/users/1?next=/dashboard',
       headers: {
         host: 'localhost'
-      },
+      }
     };
     const ctx = context(req);
     expect(ctx.href).toBe('http://localhost/users/1?next=/dashboard');
@@ -18,25 +18,27 @@ describe('ctx.href', () => {
     expect(ctx.href).toBe('http://localhost/users/1?next=/dashboard');
   });
 
-  it('should work with `GET http://example.com/foo`', done => {
-    const app = new Koa();
-    app.use((ctx: Context) => {
-      ctx.body = ctx.href;
-    });
-    app.listen(function(){
-      const address = this.address();
-      http.get({
-        host: 'localhost',
-        path: 'http://example.com/foo',
-        port: address.port
-      }, res => {
-        expect(res.statusCode).toBe(200);
-        let buf = '';
-        res.setEncoding('utf8');
-        res.on('data', s => buf += s);
-        res.on('end', () => {
-          expect(buf).toBe('http://example.com/foo');
-          done();
+  it('should work with `GET http://example.com/foo`', () => {
+    return new Promise(done => {
+      const app = new Koa();
+      app.use((ctx: Context) => {
+        ctx.body = ctx.href;
+      });
+      app.listen(function() {
+        const address = this.address();
+        http.get({
+          host: 'localhost',
+          path: 'http://example.com/foo',
+          port: address.port
+        }, res => {
+          expect(res.statusCode).toBe(200);
+          let buf = '';
+          res.setEncoding('utf8');
+          res.on('data', s => buf += s);
+          res.on('end', () => {
+            expect(buf).toBe('http://example.com/foo');
+            done();
+          });
         });
       });
     });

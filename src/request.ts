@@ -3,8 +3,8 @@ import parseurl from 'parseurl';
 import { format, URL } from 'url';
 
 import http from 'http';
-import net, { Socket } from "net";
-import { TLSSocket } from "tls";
+import net, { Socket } from 'net';
+import { TLSSocket } from 'tls';
 
 import contentType from 'content-type';
 import accepts from 'accepts';
@@ -25,7 +25,6 @@ export type RequestJSON = {
 }
 
 export default class Request {
-
   public req: http.IncomingMessage;
   public res: http.ServerResponse;
 

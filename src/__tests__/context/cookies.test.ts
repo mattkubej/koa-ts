@@ -97,7 +97,7 @@ describe('ctx.cookies', () => {
 
       app.use((ctx: Context) => {
         ctx.cookies = {
-          set(key: string, value: string){
+          set(key: string, value: string) {
             ctx.set(key, value);
           }
         };

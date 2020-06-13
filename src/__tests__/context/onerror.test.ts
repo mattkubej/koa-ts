@@ -74,27 +74,29 @@ describe('ctx.onerror(err)', () => {
     expect(res.headers.hasOwnProperty('x-csrf-token')).toBeFalsy();
   });
 
-  it('should ignore error after headerSent', done => {
-    const app = new Koa();
+  it('should ignore error after headerSent', () => {
+    return new Promise(done => {
+      const app = new Koa();
 
-    app.on('error', err => {
-      expect(err.message).toBe('mock error');
-      expect(err.headerSent).toBeTruthy();
-      done();
+      app.on('error', err => {
+        expect(err.message).toBe('mock error');
+        expect(err.headerSent).toBeTruthy();
+        done();
+      });
+
+      app.use(async(ctx: Context) => {
+        ctx.status = 200;
+        ctx.set('X-Foo', 'Bar');
+        ctx.flushHeaders();
+        await Promise.reject(new Error('mock error'));
+        ctx.body = 'response';
+      });
+
+      request(app.callback())
+        .get('/')
+        .expect('X-Foo', 'Bar')
+        .expect(200, () => {});
     });
-
-    app.use(async (ctx: Context) => {
-      ctx.status = 200;
-      ctx.set('X-Foo', 'Bar');
-      ctx.flushHeaders();
-      await Promise.reject(new Error('mock error'));
-      ctx.body = 'response';
-    });
-
-    request(app.callback())
-      .get('/')
-      .expect('X-Foo', 'Bar')
-      .expect(200, () => {});
   });
 
   it('should set status specified in the error using statusCode', () => {
@@ -236,22 +238,24 @@ describe('ctx.onerror(err)', () => {
       expect(removed).toBe(2);
     });
 
-    it('should stringify error if it is an object', done => {
-      const app = new Koa();
+    it('should stringify error if it is an object', () => {
+      return new Promise(done => {
+        const app = new Koa();
 
-      app.on('error', err => {
-        expect(err).toMatchObject(new Error('non-error thrown: {"key":"value"}'));
-        done();
+        app.on('error', err => {
+          expect(err).toMatchObject(new Error('non-error thrown: {"key":"value"}'));
+          done();
+        });
+
+        app.use(() => {
+          throw { key: 'value' }; // eslint-disable-line no-throw-literal
+        });
+
+        request(app.callback())
+          .get('/')
+          .expect(500)
+          .expect('Internal Server Error', () => {});
       });
-
-      app.use(() => {
-        throw {key: 'value'}; // eslint-disable-line no-throw-literal
-      });
-
-      request(app.callback())
-        .get('/')
-        .expect(500)
-        .expect('Internal Server Error', () => {});
     });
   });
 });

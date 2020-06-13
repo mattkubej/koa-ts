@@ -1,5 +1,5 @@
 import http from 'http';
-import { Socket } from "net";
+import { Socket } from 'net';
 
 import vary from 'vary';
 import { extname } from 'path';
@@ -28,7 +28,6 @@ export type ResponseJSON = {
 };
 
 export default class Response {
-
   public req: http.IncomingMessage;
   public res: http.ServerResponse;
 

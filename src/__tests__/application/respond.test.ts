@@ -382,7 +382,7 @@ describe('app.respond', () => {
         const res = await request(server)
           .get('/')
           .expect(700)
-          .expect('custom status')
+          .expect('custom status');
 
         expect(res.res.statusMessage).toBe('custom status');
       });
@@ -615,21 +615,23 @@ describe('app.respond', () => {
         expect(res.body).toStrictEqual(pkg);
       });
 
-    it('should handle errors', done => {
-      const app = new Koa();
+    it('should handle errors', () => {
+      return new Promise(done => {
+        const app = new Koa();
 
-      app.use((ctx: Context) => {
-        ctx.set('Content-Type', 'application/json; charset=utf-8');
-        ctx.body = fs.createReadStream('does not exist');
+        app.use((ctx: Context) => {
+          ctx.set('Content-Type', 'application/json; charset=utf-8');
+          ctx.body = fs.createReadStream('does not exist');
+        });
+
+        const server = app.listen();
+
+        request(server)
+          .get('/')
+          .expect('Content-Type', 'text/plain; charset=utf-8')
+          .expect(404)
+          .end(done);
       });
-
-      const server = app.listen();
-
-      request(server)
-        .get('/')
-        .expect('Content-Type', 'text/plain; charset=utf-8')
-        .expect(404)
-        .end(done);
     });
 
     it('should handle errors when no content status', () => {
@@ -647,21 +649,23 @@ describe('app.respond', () => {
         .expect(204);
     });
 
-    it('should handle all intermediate stream body errors', done => {
-      const app = new Koa();
+    it('should handle all intermediate stream body errors', () => {
+      return new Promise(done => {
+        const app = new Koa();
 
-      app.use((ctx: Context) => {
-        ctx.body = fs.createReadStream('does not exist');
-        ctx.body = fs.createReadStream('does not exist');
-        ctx.body = fs.createReadStream('does not exist');
+        app.use((ctx: Context) => {
+          ctx.body = fs.createReadStream('does not exist');
+          ctx.body = fs.createReadStream('does not exist');
+          ctx.body = fs.createReadStream('does not exist');
+        });
+
+        const server = app.listen();
+
+        request(server)
+          .get('/')
+          .expect(404)
+          .end(done);
       });
-
-      const server = app.listen();
-
-      request(server)
-        .get('/')
-        .expect(404)
-        .end(done);
     });
   });
 
@@ -683,21 +687,23 @@ describe('app.respond', () => {
   });
 
   describe('when an error occurs', () => {
-    it('should emit "error" on the app', done => {
-      const app = new Koa();
+    it('should emit "error" on the app', () => {
+      return new Promise(done => {
+        const app = new Koa();
 
-      app.use(() => {
-        throw new Error('boom');
+        app.use(() => {
+          throw new Error('boom');
+        });
+
+        app.on('error', err => {
+          expect(err.message).toBe('boom');
+          done();
+        });
+
+        request(app.callback())
+          .get('/')
+          .end(() => {});
       });
-
-      app.on('error', err => {
-        expect(err.message).toBe('boom');
-        done();
-      });
-
-      request(app.callback())
-        .get('/')
-        .end(() => {});
     });
 
     describe('with an .expose property', () => {

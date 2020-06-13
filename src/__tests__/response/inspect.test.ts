@@ -9,7 +9,7 @@ describe('res.inspect()', () => {
       expect(res.inspect()).toBeUndefined();
 
       // Note: should this be true?
-      //expect(util.inspect(res)).toBe('undefined');
+      // expect(util.inspect(res)).toBe('undefined');
     });
   });
 
@@ -30,6 +30,6 @@ describe('res.inspect()', () => {
     expect(res.inspect()).toMatchObject(expected);
 
     // Note: should this be true?
-    //expect(util.inspect(res)).toMatchObject(util.inspect(expected));
+    // expect(util.inspect(res)).toMatchObject(util.inspect(expected));
   });
 });

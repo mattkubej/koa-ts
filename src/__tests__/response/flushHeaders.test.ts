@@ -81,68 +81,72 @@ describe('ctx.flushHeaders()', () => {
     expect(res.headers.vary).toBeUndefined();
   });
 
-  it('should flush headers first and delay to send data', done => {
-    const PassThrough = require('stream').PassThrough;
-    const app = new Koa();
+  it('should flush headers first and delay to send data', () => {
+    return new Promise(done => {
+      const PassThrough = require('stream').PassThrough;
+      const app = new Koa();
 
-    app.use((ctx: Context) => {
-      ctx.type = 'json';
-      ctx.status = 200;
-      ctx.headers['Link'] = '</css/mycss.css>; as=style; rel=preload, <https://img.craftflair.com>; rel=preconnect; crossorigin';
-      const stream = ctx.body = new PassThrough();
-      ctx.flushHeaders();
+      app.use((ctx: Context) => {
+        ctx.type = 'json';
+        ctx.status = 200;
+        ctx.headers.Link = '</css/mycss.css>; as=style; rel=preload, <https://img.craftflair.com>; rel=preconnect; crossorigin';
+        const stream = ctx.body = new PassThrough();
+        ctx.flushHeaders();
 
-      setTimeout(() => {
-        stream.end(JSON.stringify({ message: 'hello!' }));
-      }, 10000);
-    });
+        setTimeout(() => {
+          stream.end(JSON.stringify({ message: 'hello!' }));
+        }, 10000);
+      });
 
-    app.listen(function(err: Error){
-      if (err) return done(err);
+      app.listen(function(err: Error) {
+        if (err) return done(err);
 
-      const port = this.address().port;
+        const port = this.address().port;
 
-      http.request({
-        port
-      })
-        .on('response', res => {
-          const onData = () => done(new Error('boom'));
-          res.on('data', onData);
-
-          // shouldn't receive any data for a while
-          setTimeout(() => {
-            res.removeListener('data', onData);
-            done();
-          }, 1000);
+        http.request({
+          port
         })
-        .on('error', done)
-        .end();
+          .on('response', res => {
+            const onData = () => done(new Error('boom'));
+            res.on('data', onData);
+
+            // shouldn't receive any data for a while
+            setTimeout(() => {
+              res.removeListener('data', onData);
+              done();
+            }, 1000);
+          })
+          .on('error', done)
+          .end();
+      });
     });
   });
 
-  it('should catch stream error', done => {
-    const PassThrough = require('stream').PassThrough;
-    const app = new Koa();
-    app.once('error', err => {
-      expect(err.message).toBe('mock error');
-      done();
+  it('should catch stream error', () => {
+    return new Promise(done => {
+      const PassThrough = require('stream').PassThrough;
+      const app = new Koa();
+      app.once('error', err => {
+        expect(err.message).toBe('mock error');
+        done();
+      });
+
+      app.use((ctx: Context) => {
+        ctx.type = 'json';
+        ctx.status = 200;
+        ctx.headers.Link = '</css/mycss.css>; as=style; rel=preload, <https://img.craftflair.com>; rel=preconnect; crossorigin';
+        ctx.length = 20;
+        ctx.flushHeaders();
+        const stream = ctx.body = new PassThrough();
+
+        setTimeout(() => {
+          stream.emit('error', new Error('mock error'));
+        }, 100);
+      });
+
+      const server = app.listen();
+
+      request(server).get('/').end();
     });
-
-    app.use((ctx: Context) => {
-      ctx.type = 'json';
-      ctx.status = 200;
-      ctx.headers['Link'] = '</css/mycss.css>; as=style; rel=preload, <https://img.craftflair.com>; rel=preconnect; crossorigin';
-      ctx.length = 20;
-      ctx.flushHeaders();
-      const stream = ctx.body = new PassThrough();
-
-      setTimeout(() => {
-        stream.emit('error', new Error('mock error'));
-      }, 100);
-    });
-
-    const server = app.listen();
-
-    request(server).get('/').end();
   });
 });

@@ -14,16 +14,16 @@ describe('ctx.set(name, val)', () => {
   });
 
   // TODO: is this necessary?
-  //it('should coerce undefined to string', () => {
-    //const ctx = context();
-    //ctx.set('x-foo', undefined);
-    //expect(ctx.response.header['x-foo']).toBe('undefined');
-  //});
+  // it('should coerce undefined to string', () => {
+  // const ctx = context();
+  // ctx.set('x-foo', undefined);
+  // expect(ctx.response.header['x-foo']).toBe('undefined');
+  // });
 
   it('should set a field value of array', () => {
     const ctx = context();
     ctx.set('x-foo', ['foo', 'bar']);
-    expect(ctx.response.header['x-foo']).toStrictEqual([ 'foo', 'bar' ]);
+    expect(ctx.response.header['x-foo']).toStrictEqual(['foo', 'bar']);
   });
 });
 

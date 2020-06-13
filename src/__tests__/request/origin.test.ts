@@ -6,7 +6,7 @@ describe('ctx.origin', () => {
       url: '/users/1?next=/dashboard',
       headers: {
         host: 'localhost'
-      },
+      }
     };
     const ctx = context(req);
     expect(ctx.origin).toBe('http://localhost');

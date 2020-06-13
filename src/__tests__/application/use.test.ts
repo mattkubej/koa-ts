@@ -49,7 +49,7 @@ describe('app.use(fn)', () => {
       });
     });
 
-    app.use(function * (next: Function){
+    app.use(function * (next: Function) {
       calls.push(2);
       yield next;
       calls.push(5);
@@ -87,7 +87,7 @@ describe('app.use(fn)', () => {
     const app = new Koa();
 
     app.use((_: Context, next: Function) => next());
-    app.use(function * (){ this.body = 'generator'; });
+    app.use(function * () { this.body = 'generator'; });
 
     return request(app.callback())
       .get('/')
@@ -103,13 +103,15 @@ describe('app.use(fn)', () => {
     });
   });
 
-  it('should output deprecation message for generator functions', done => {
-    process.once('deprecation', message => {
-      expect(/Support for generators will be removed/.test(String(message))).toBeTruthy();
-      done();
-    });
+  it('should output deprecation message for generator functions', () => {
+    return new Promise(done => {
+      process.once('deprecation', message => {
+        expect(/Support for generators will be removed/.test(String(message))).toBeTruthy();
+        done();
+      });
 
-    const app = new Koa();
-    app.use(function * (){});
+      const app = new Koa();
+      app.use(function * () {});
+    });
   });
 });

@@ -40,8 +40,8 @@ describe('res.status=', () => {
     describe('and HTTP/2', () => {
       it('should not set the status message', () => {
         const res = response({
-          'httpVersionMajor': 2,
-          'httpVersion': '2.0'
+          httpVersionMajor: 2,
+          httpVersion: '2.0'
         });
         res.status = 200;
         expect(res.res.statusMessage).toBeUndefined();
@@ -55,7 +55,7 @@ describe('res.status=', () => {
     });
   });
 
-  function strip(status: number){
+  function strip(status: number) {
     it('should strip content related header fields', async() => {
       const app = new Koa();
 

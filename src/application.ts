@@ -11,15 +11,15 @@ import Stream from 'stream';
 import util from 'util';
 import { HttpError, HttpErrorConstructor } from 'http-errors';
 
-const debug = Debug('koa:application');
-const deprecate = Deprecate('koa');
-
 import Context from './context';
 import Request from './request';
 import Response from './response';
 
 import only from './utils/only';
 import isError from './utils/isError';
+
+const debug = Debug('koa:application');
+const deprecate = Deprecate('koa');
 
 export class KoaError extends Error {
   expose?: boolean;
@@ -46,7 +46,6 @@ export type ApplicationJSON = {
 type HandleRequestFn = (req: http.IncomingMessage, res: http.ServerResponse) => HandleRequestFn;
 
 export default class Application extends EventEmitter {
-
   public silent: boolean;
 
   // TODO: validate types;
@@ -64,7 +63,7 @@ export default class Application extends EventEmitter {
   public response: Response;
 
   constructor(options: Options = {}) {
-    super()
+    super();
     this.proxy = options.proxy || false;
     this.subdomainOffset = options.subdomainOffset || 2;
     this.proxyIpHeader = options.proxyIpHeader || 'X-Forwarded-For';
@@ -72,7 +71,7 @@ export default class Application extends EventEmitter {
     this.env = options.env || process.env.NODE_ENV || 'development';
     if (options.keys) this.keys = options.keys;
     this.middleware = [];
-    
+
     this.context = new Context();
     this.request = new Request();
     this.response = new Response();
@@ -201,7 +200,7 @@ function respond(ctx: Context) {
     if (ctx.req.httpVersionMajor >= 2) {
       body = String(code);
     } else {
-      // TODO: this differs from the original implementation, but supports 
+      // TODO: this differs from the original implementation, but supports
       //       existing tests
       body = ctx.message || statuses.message[code] || String(code);
     }
