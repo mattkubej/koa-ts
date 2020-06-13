@@ -236,8 +236,12 @@ export default class Response {
    * @return {String|false}
    * @api public
    */
-  is(type: string, ...types: string[]): string | false {
-    return typeis.is(this.type, type, ...types);
+  is(type?: string | string[], ...types: string[]): string | false {
+    if (Array.isArray(type)) {
+      return typeis.is(this.type, type);
+    } else {
+      return typeis.is(this.type, type, ...types);
+    }
   }
 
   get(field: string): string | number | string[] {
