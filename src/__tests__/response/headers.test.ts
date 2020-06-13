@@ -10,7 +10,7 @@ describe('res.header', () => {
   describe('when res._headers not present', () => {
     it('should return empty object', () => {
       const res = response();
-      res.res._headers = null;
+      (res.res as any)._headers = null;
       expect(res.headers).toMatchObject({});
     });
   });
