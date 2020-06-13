@@ -13,7 +13,7 @@ describe('res.status=', () => {
       });
 
       it('should not throw', () => {
-        response().status = 403;
+        expect(() => { response().status = 403; }).not.toThrow();
       });
     });
 
@@ -33,7 +33,7 @@ describe('res.status=', () => {
       });
 
       it('should not throw', () => {
-        response().status = 700;
+        expect(() => { response().status = 700; }).not.toThrow();
       });
     });
 
@@ -51,7 +51,7 @@ describe('res.status=', () => {
 
   describe('when a status string', () => {
     it('should throw', () => {
-      expect(() => response().status = 'forbidden').toThrow(/status code must be a number/);
+      expect(() => { (response() as any).status = 'forbidden'; }).toThrow(/status code must be a number/);
     });
   });
 
@@ -74,9 +74,9 @@ describe('res.status=', () => {
         .get('/')
         .expect(status);
 
-      expect(res.headers.hasOwnProperty('content-type')).toBeFalsy();
-      expect(res.headers.hasOwnProperty('content-length')).toBeFalsy();
-      expect(res.headers.hasOwnProperty('content-encoding')).toBeFalsy();
+      expect(Object.prototype.hasOwnProperty.call(res.headers, 'content-type')).toBeFalsy();
+      expect(Object.prototype.hasOwnProperty.call(res.headers, 'content-length')).toBeFalsy();
+      expect(Object.prototype.hasOwnProperty.call(res.headers, 'content-encoding')).toBeFalsy();
       expect(res.text.length).toBe(0);
     });
 
@@ -95,9 +95,9 @@ describe('res.status=', () => {
         .get('/')
         .expect(status);
 
-      expect(res.headers.hasOwnProperty('content-type')).toBeFalsy();
-      expect(res.headers.hasOwnProperty('content-length')).toBeFalsy();
-      expect(res.headers.hasOwnProperty('content-encoding')).toBeFalsy();
+      expect(Object.prototype.hasOwnProperty.call(res.headers, 'content-type')).toBeFalsy();
+      expect(Object.prototype.hasOwnProperty.call(res.headers, 'content-length')).toBeFalsy();
+      expect(Object.prototype.hasOwnProperty.call(res.headers, 'content-encoding')).toBeFalsy();
       expect(res.text.length).toBe(0);
     });
   }
