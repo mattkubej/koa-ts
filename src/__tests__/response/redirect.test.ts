@@ -13,7 +13,7 @@ describe('ctx.redirect(url)', () => {
   });
 
   it('should auto fix not encode url', () => {
-    return new Promise(done => {
+    return new Promise(resolve => {
       const app = new Koa();
 
       app.use((ctx: Context) => {
@@ -23,10 +23,10 @@ describe('ctx.redirect(url)', () => {
       request(app.callback())
         .get('/')
         .end((err: Error, res: Response) => {
-          if (err) return done(err);
+          if (err) return resolve(err);
           expect(res.status).toBe(302);
           expect(res.headers.location).toBe('http://google.com/%F0%9F%98%93');
-          done();
+          resolve();
         });
     });
   });
