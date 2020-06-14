@@ -19,7 +19,7 @@ describe('ctx.href', () => {
   });
 
   it('should work with `GET http://example.com/foo`', () => {
-    return new Promise(done => {
+    return new Promise(resolve => {
       const app = new Koa();
       app.use((ctx: Context) => {
         ctx.body = ctx.href;
@@ -37,7 +37,7 @@ describe('ctx.href', () => {
           res.on('data', s => buf += s);
           res.on('end', () => {
             expect(buf).toBe('http://example.com/foo');
-            done();
+            resolve();
           });
         });
       });
