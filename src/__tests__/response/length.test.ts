@@ -1,17 +1,6 @@
 import { response } from '../helpers/context';
 import fs from 'fs';
 
-// Note: Is this just to support node 7.7?
-// describe('res.length', () => {
-// describe('when Content-Length is defined', () => {
-// it('should return a number', () => {
-// const res = response();
-// res.header['content-length'] = '120';
-// expect(res.length).toBe(120);
-// });
-// });
-// });
-
 describe('res.length', () => {
   describe('when Content-Length is defined', () => {
     it('should return a number', () => {
