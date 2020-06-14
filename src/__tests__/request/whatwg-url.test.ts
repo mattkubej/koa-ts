@@ -4,14 +4,14 @@ describe('req.URL', () => {
   describe('should not throw when', () => {
     it('host is void', () => {
       // Accessing the URL should not throw.
-      request().URL;
+      expect(() => request().URL).not.toThrow();
     });
 
     it('header.host is invalid', () => {
       const req = request();
       req.header.host = 'invalid host';
       // Accessing the URL should not throw.
-      req.URL;
+      expect(() => req.URL).not.toThrow();
     });
   });
 
