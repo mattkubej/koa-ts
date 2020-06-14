@@ -20,7 +20,7 @@ describe('res.writable', () => {
     }
 
     it('should always writable and response all requests', () => {
-      return new Promise(done => {
+      return new Promise(resolve => {
         const app = new Koa();
         let count = 0;
         app.use((ctx: Context) => {
@@ -33,7 +33,7 @@ describe('res.writable', () => {
           const responses = Buffer.concat(datas).toString();
           expect(/request 1, writable: true/.test(responses)).toBeTruthy();
           expect(/request 2, writable: true/.test(responses)).toBeTruthy();
-          done();
+          resolve();
         });
       });
     });
@@ -51,18 +51,18 @@ describe('res.writable', () => {
     }
 
     it('should not writable', () => {
-      return new Promise(done => {
+      return expect(new Promise(resolve => {
         const app = new Koa();
         app.use((ctx: Context) => {
           sleep(1000)
             .then(() => {
-              if (ctx.writable) return done(new Error('ctx.writable should not be true'));
-              done();
+              if (ctx.writable) return resolve(new Error('ctx.writable should not be true'));
+              resolve('pass');
             });
         });
         const server = app.listen();
         requestClosed(server);
-      });
+      })).resolves.toBe('pass');
     });
   });
 
@@ -80,16 +80,16 @@ describe('res.writable', () => {
     }
 
     it('should not writable', () => {
-      return new Promise(done => {
+      return expect(new Promise(resolve => {
         const app = new Koa();
         app.use((ctx: Context) => {
           ctx.res.end();
-          if (ctx.writable) return done(new Error('ctx.writable should not be true'));
-          done();
+          if (ctx.writable) return resolve(new Error('ctx.writable should not be true'));
+          resolve('pass');
         });
         const server = app.listen();
         request(server);
-      });
+      })).resolves.toBe('pass');
     });
   });
 });
