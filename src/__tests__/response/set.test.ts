@@ -13,13 +13,6 @@ describe('ctx.set(name, val)', () => {
     expect(ctx.response.header['x-foo']).toBe(5);
   });
 
-  // TODO: is this necessary?
-  // it('should coerce undefined to string', () => {
-  // const ctx = context();
-  // ctx.set('x-foo', undefined);
-  // expect(ctx.response.header['x-foo']).toBe('undefined');
-  // });
-
   it('should set a field value of array', () => {
     const ctx = context();
     ctx.set('x-foo', ['foo', 'bar']);
