@@ -29,7 +29,7 @@ describe('ctx.attachment([filename])', () => {
       expect(ctx.response.header['content-disposition']).toBe(str);
     });
 
-    it('should work with http client', () => {
+    it('should work with http client', async() => {
       const app = new Koa();
 
       app.use((ctx: Context) => {
@@ -37,11 +37,10 @@ describe('ctx.attachment([filename])', () => {
         ctx.body = { foo: 'bar' };
       });
 
-      return request(app.callback())
-        .get('/')
-        .expect('content-disposition', 'attachment; filename="include-no-ascii-char-???-ok.json"; filename*=UTF-8\'\'include-no-ascii-char-%E4%B8%AD%E6%96%87%E5%90%8D-ok.json')
-        .expect({ foo: 'bar' })
-        .expect(200);
+      const response = await request(app.callback()).get('/');
+      expect(response.headers['content-disposition']).toBe('attachment; filename="include-no-ascii-char-???-ok.json"; filename*=UTF-8\'\'include-no-ascii-char-%E4%B8%AD%E6%96%87%E5%90%8D-ok.json');
+      expect(response.body).toMatchObject({ foo: 'bar' });
+      expect(response.status).toBe(200);
     });
   });
 });
