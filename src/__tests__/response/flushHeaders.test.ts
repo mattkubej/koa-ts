@@ -22,7 +22,7 @@ describe('ctx.flushHeaders()', () => {
       .expect('Body');
   });
 
-  it('should allow a response afterwards', () => {
+  it('should allow a response afterwards', async() => {
     const app = new Koa();
 
     app.use((ctx: Context) => {
@@ -33,14 +33,13 @@ describe('ctx.flushHeaders()', () => {
     });
 
     const server = app.listen();
-    return request(server)
-      .get('/')
-      .expect(200)
-      .expect('Content-Type', 'text/plain')
-      .expect('Body');
+    const response = await request(server).get('/');
+    expect(response.status).toBe(200);
+    expect(response.headers['content-type']).toBe('text/plain');
+    expect(response.text).toBe('Body');
   });
 
-  it('should send the correct status code', () => {
+  it('should send the correct status code', async() => {
     const app = new Koa();
 
     app.use((ctx: Context) => {
@@ -51,11 +50,10 @@ describe('ctx.flushHeaders()', () => {
     });
 
     const server = app.listen();
-    return request(server)
-      .get('/')
-      .expect(401)
-      .expect('Content-Type', 'text/plain')
-      .expect('Body');
+    const response = await request(server).get('/');
+    expect(response.status).toBe(401);
+    expect(response.headers['content-type']).toBe('text/plain');
+    expect(response.text).toBe('Body');
   });
 
   it('should ignore set header after flushHeaders', async() => {
@@ -82,7 +80,7 @@ describe('ctx.flushHeaders()', () => {
   });
 
   it('should flush headers first and delay to send data', () => {
-    return new Promise(done => {
+    return expect(new Promise(resolve => {
       const PassThrough = require('stream').PassThrough;
       const app = new Koa();
 
@@ -99,7 +97,7 @@ describe('ctx.flushHeaders()', () => {
       });
 
       app.listen(function(err: Error) {
-        if (err) return done(err);
+        if (err) return resolve(err);
 
         const port = this.address().port;
 
@@ -107,19 +105,19 @@ describe('ctx.flushHeaders()', () => {
           port
         })
           .on('response', res => {
-            const onData = () => done(new Error('boom'));
+            const onData = () => resolve(new Error('boom'));
             res.on('data', onData);
 
             // shouldn't receive any data for a while
             setTimeout(() => {
               res.removeListener('data', onData);
-              done();
+              resolve('pass');
             }, 1000);
           })
-          .on('error', done)
+          .on('error', resolve)
           .end();
       });
-    });
+    })).resolves.toBe('pass');
   });
 
   it('should catch stream error', () => {
