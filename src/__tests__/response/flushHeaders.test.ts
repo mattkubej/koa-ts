@@ -121,12 +121,12 @@ describe('ctx.flushHeaders()', () => {
   });
 
   it('should catch stream error', () => {
-    return new Promise(done => {
+    return new Promise(resolve => {
       const PassThrough = require('stream').PassThrough;
       const app = new Koa();
       app.once('error', err => {
         expect(err.message).toBe('mock error');
-        done();
+        resolve();
       });
 
       app.use((ctx: Context) => {
