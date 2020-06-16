@@ -3,193 +3,151 @@ import { KoaError } from '../../application';
 
 describe('ctx.throw(msg)', () => {
   it('should set .status to 500', () => {
-    const ctx = context();
-
-    try {
+    expect(() => {
+      const ctx = context();
       ctx.throw('boom');
-    } catch (err) {
-      expect(err.status).toBe(500);
-      expect(err.expose).toBeFalsy();
-    }
+    }).toThrow(
+      expect.objectContaining({ status: 500, expose: false })
+    );
   });
 });
 
 describe('ctx.throw(err)', () => {
   it('should set .status to 500', () => {
-    const ctx = context();
-    const err = new Error('test');
-
-    try {
+    expect(() => {
+      const ctx = context();
+      const err = new Error('test');
       ctx.throw(err);
-    } catch (err) {
-      expect(err.status).toBe(500);
-      expect(err.message).toBe('test');
-      expect(err.expose).toBeFalsy();
-    }
+    }).toThrow(
+      expect.objectContaining({ status: 500, expose: false, message: 'test' })
+    );
   });
 });
 
 describe('ctx.throw(err, status)', () => {
   it('should throw the error and set .status', () => {
-    const ctx = context();
-    const error = new Error('test');
-
-    try {
+    expect(() => {
+      const ctx = context();
+      const error = new Error('test');
       ctx.throw(error, 422);
-    } catch (err) {
-      expect(err.status).toBe(422);
-      expect(err.message).toBe('test');
-      expect(err.expose).toBeTruthy();
-    }
+    }).toThrow(
+      expect.objectContaining({ status: 422, expose: true, message: 'test' })
+    );
   });
 });
 
 describe('ctx.throw(status, err)', () => {
   it('should throw the error and set .status', () => {
-    const ctx = context();
-    const error = new Error('test');
-
-    try {
+    expect(() => {
+      const ctx = context();
+      const error = new Error('test');
       ctx.throw(422, error);
-    } catch (err) {
-      expect(err.status).toBe(422);
-      expect(err.message).toBe('test');
-      expect(err.expose).toBeTruthy();
-    }
+    }).toThrow(
+      expect.objectContaining({ status: 422, expose: true, message: 'test' })
+    );
   });
 });
 
 describe('ctx.throw(msg, status)', () => {
   it('should throw an error', () => {
-    const ctx = context();
-
-    try {
+    expect(() => {
+      const ctx = context();
       ctx.throw('name required', 400);
-    } catch (err) {
-      expect(err.message).toBe('name required');
-      expect(err.status).toBe(400);
-      expect(err.expose).toBeTruthy();
-    }
+    }).toThrow(
+      expect.objectContaining({ status: 400, expose: true, message: 'name required' })
+    );
   });
 });
 
 describe('ctx.throw(status, msg)', () => {
   it('should throw an error', () => {
-    const ctx = context();
-
-    try {
+    expect(() => {
+      const ctx = context();
       ctx.throw(400, 'name required');
-    } catch (err) {
-      expect(err.message).toBe('name required');
-      expect(400).toBe(err.status);
-      expect(err.expose).toBeTruthy();
-    }
+    }).toThrow(
+      expect.objectContaining({ status: 400, expose: true, message: 'name required' })
+    );
   });
 });
 
 describe('ctx.throw(status)', () => {
   it('should throw an error', () => {
-    const ctx = context();
-
-    try {
+    expect(() => {
+      const ctx = context();
       ctx.throw(400);
-    } catch (err) {
-      expect(err.message).toBe('Bad Request');
-      expect(err.status).toBe(400);
-      expect(err.expose).toBeTruthy();
-    }
+    }).toThrow(
+      expect.objectContaining({ status: 400, expose: true, message: 'Bad Request' })
+    );
   });
 
   describe('when not valid status', () => {
     it('should not expose', () => {
-      const ctx = context();
-
-      try {
+      expect(() => {
+        const ctx = context();
         const err = new KoaError('some error');
         err.status = -1;
         ctx.throw(err);
-      } catch (err) {
-        expect(err.message).toBe('some error');
-        expect(err.expose).toBeFalsy();
-      }
+      }).toThrow(
+        expect.objectContaining({ expose: false, message: 'some error' })
+      );
     });
   });
 });
 
 describe('ctx.throw(status, msg, props)', () => {
   it('should mixin props', () => {
-    const ctx = context();
-
-    try {
+    expect(() => {
+      const ctx = context();
       ctx.throw(400, 'msg', { prop: true });
-    } catch (err) {
-      expect(err.message).toBe('msg');
-      expect(err.status).toBe(400);
-      expect(err.expose).toBeTruthy();
-      expect(err.prop).toBeTruthy();
-    }
+    }).toThrow(
+      expect.objectContaining({ status: 400, expose: true, message: 'msg', prop: true })
+    );
   });
 
   describe('when props include status', () => {
     it('should be ignored', () => {
-      const ctx = context();
-
-      try {
+      expect(() => {
+        const ctx = context();
         ctx.throw(400, 'msg', {
           prop: true,
           status: -1
         });
-      } catch (err) {
-        expect(err.message).toBe('msg');
-        expect(err.status).toBe(400);
-        expect(err.expose).toBeTruthy();
-        expect(err.prop).toBeTruthy();
-      }
+      }).toThrow(
+        expect.objectContaining({ status: 400, expose: true, message: 'msg', prop: true })
+      );
     });
   });
 });
 
 describe('ctx.throw(msg, props)', () => {
   it('should mixin props', () => {
-    const ctx = context();
-
-    try {
+    expect(() => {
+      const ctx = context();
       ctx.throw('msg', { prop: true });
-    } catch (err) {
-      expect(err.message).toBe('msg');
-      expect(err.status).toBe(500);
-      expect(err.expose).toBeFalsy();
-      expect(err.prop).toBeTruthy();
-    }
+    }).toThrow(
+      expect.objectContaining({ status: 500, expose: false, message: 'msg', prop: true })
+    );
   });
 });
 
 describe('ctx.throw(status, props)', () => {
   it('should mixin props', () => {
-    const ctx = context();
-
-    try {
+    expect(() => {
+      const ctx = context();
       ctx.throw(400, { prop: true });
-    } catch (err) {
-      expect(err.message).toBe('Bad Request');
-      expect(err.status).toBe(400);
-      expect(err.expose).toBeTruthy();
-      expect(err.prop).toBeTruthy();
-    }
+    }).toThrow(
+      expect.objectContaining({ status: 400, expose: true, message: 'Bad Request', prop: true })
+    );
   });
 });
 
 describe('ctx.throw(err, props)', () => {
   it('should mixin props', () => {
-    const ctx = context();
-
-    try {
+    expect(() => {
+      const ctx = context();
       ctx.throw(new Error('test'), { prop: true });
-    } catch (err) {
-      expect(err.message).toBe('test');
-      expect(err.status).toBe(500);
-      expect(err.expose).toBeFalsy();
-      expect(err.prop).toBeTruthy();
-    }
+    }).toThrow(
+      expect.objectContaining({ status: 500, expose: false, message: 'test', prop: true })
+    );
   });
 });
