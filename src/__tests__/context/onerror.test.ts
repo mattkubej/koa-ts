@@ -4,7 +4,7 @@ import context from '../helpers/context';
 import Context from '../../context';
 
 describe('ctx.onerror(err)', () => {
-  it('should respond', () => {
+  it('should respond', async() => {
     const app = new Koa();
 
     app.use((ctx: Context) => {
@@ -15,11 +15,10 @@ describe('ctx.onerror(err)', () => {
 
     const server = app.listen();
 
-    return request(server)
-      .get('/')
-      .expect(418)
-      .expect('Content-Type', 'text/plain; charset=utf-8')
-      .expect('Content-Length', '4');
+    const response = await request(server).get('/');
+    expect(response.status).toBe(418);
+    expect(response.headers['content-type']).toBe('text/plain; charset=utf-8');
+    expect(response.headers['content-length']).toBe('4');
   });
 
   it('should unset all headers', async() => {
@@ -35,14 +34,12 @@ describe('ctx.onerror(err)', () => {
 
     const server = app.listen();
 
-    const res = await request(server)
-      .get('/')
-      .expect(418)
-      .expect('Content-Type', 'text/plain; charset=utf-8')
-      .expect('Content-Length', '4');
-
-    expect(Object.prototype.hasOwnProperty.call(res.headers, 'vary')).toBeFalsy();
-    expect(Object.prototype.hasOwnProperty.call(res.headers, 'x-csrf-token')).toBeFalsy();
+    const response = await request(server).get('/');
+    expect(response.status).toBe(418);
+    expect(response.headers['content-type']).toBe('text/plain; charset=utf-8');
+    expect(response.headers['content-length']).toBe('4');
+    expect(Object.prototype.hasOwnProperty.call(response.headers, 'vary')).toBeFalsy();
+    expect(Object.prototype.hasOwnProperty.call(response.headers, 'x-csrf-token')).toBeFalsy();
   });
 
   it('should set headers specified in the error', async() => {
@@ -64,14 +61,12 @@ describe('ctx.onerror(err)', () => {
 
     const server = app.listen();
 
-    const res = await request(server)
-      .get('/')
-      .expect(418)
-      .expect('Content-Type', 'text/plain; charset=utf-8')
-      .expect('X-New-Header', 'Value');
-
-    expect(Object.prototype.hasOwnProperty.call(res.headers, 'vary')).toBeFalsy();
-    expect(Object.prototype.hasOwnProperty.call(res.headers, 'x-csrf-token')).toBeFalsy();
+    const response = await request(server).get('/');
+    expect(response.status).toBe(418);
+    expect(response.headers['content-type']).toBe('text/plain; charset=utf-8');
+    expect(response.headers['x-new-header']).toBe('Value');
+    expect(Object.prototype.hasOwnProperty.call(response.headers, 'vary')).toBeFalsy();
+    expect(Object.prototype.hasOwnProperty.call(response.headers, 'x-csrf-token')).toBeFalsy();
   });
 
   it('should ignore error after headerSent', () => {
@@ -99,7 +94,7 @@ describe('ctx.onerror(err)', () => {
     });
   });
 
-  it('should set status specified in the error using statusCode', () => {
+  it('should set status specified in the error using statusCode', async() => {
     const app = new Koa();
 
     app.use((ctx: Context) => {
@@ -111,16 +106,15 @@ describe('ctx.onerror(err)', () => {
 
     const server = app.listen();
 
-    return request(server)
-      .get('/')
-      .expect(404)
-      .expect('Content-Type', 'text/plain; charset=utf-8')
-      .expect('Not Found');
+    const response = await request(server).get('/');
+    expect(response.status).toBe(404);
+    expect(response.headers['content-type']).toBe('text/plain; charset=utf-8');
+    expect(response.text).toBe('Not Found');
   });
 
   describe('when invalid err.statusCode', () => {
     describe('not number', () => {
-      it('should respond 500', () => {
+      it('should respond 500', async() => {
         const app = new Koa();
 
         app.use((ctx: Context) => {
@@ -132,18 +126,17 @@ describe('ctx.onerror(err)', () => {
 
         const server = app.listen();
 
-        return request(server)
-          .get('/')
-          .expect(500)
-          .expect('Content-Type', 'text/plain; charset=utf-8')
-          .expect('Internal Server Error');
+        const response = await request(server).get('/');
+        expect(response.status).toBe(500);
+        expect(response.headers['content-type']).toBe('text/plain; charset=utf-8');
+        expect(response.text).toBe('Internal Server Error');
       });
     });
   });
 
   describe('when invalid err.status', () => {
     describe('not number', () => {
-      it('should respond 500', () => {
+      it('should respond 500', async() => {
         const app = new Koa();
 
         app.use((ctx: Context) => {
@@ -155,15 +148,14 @@ describe('ctx.onerror(err)', () => {
 
         const server = app.listen();
 
-        return request(server)
-          .get('/')
-          .expect(500)
-          .expect('Content-Type', 'text/plain; charset=utf-8')
-          .expect('Internal Server Error');
+        const response = await request(server).get('/');
+        expect(response.status).toBe(500);
+        expect(response.headers['content-type']).toBe('text/plain; charset=utf-8');
+        expect(response.text).toBe('Internal Server Error');
       });
     });
     describe('when ENOENT error', () => {
-      it('should respond 404', () => {
+      it('should respond 404', async() => {
         const app = new Koa();
 
         app.use((ctx: Context) => {
@@ -175,15 +167,14 @@ describe('ctx.onerror(err)', () => {
 
         const server = app.listen();
 
-        return request(server)
-          .get('/')
-          .expect(404)
-          .expect('Content-Type', 'text/plain; charset=utf-8')
-          .expect('Not Found');
+        const response = await request(server).get('/');
+        expect(response.status).toBe(404);
+        expect(response.headers['content-type']).toBe('text/plain; charset=utf-8');
+        expect(response.text).toBe('Not Found');
       });
     });
     describe('not http status code', () => {
-      it('should respond 500', () => {
+      it('should respond 500', async() => {
         const app = new Koa();
 
         app.use((ctx: Context) => {
@@ -195,17 +186,16 @@ describe('ctx.onerror(err)', () => {
 
         const server = app.listen();
 
-        return request(server)
-          .get('/')
-          .expect(500)
-          .expect('Content-Type', 'text/plain; charset=utf-8')
-          .expect('Internal Server Error');
+        const response = await request(server).get('/');
+        expect(response.status).toBe(500);
+        expect(response.headers['content-type']).toBe('text/plain; charset=utf-8');
+        expect(response.text).toBe('Internal Server Error');
       });
     });
   });
 
   describe('when non-error thrown', () => {
-    it('should response non-error thrown message', () => {
+    it('should response non-error thrown message', async() => {
       const app = new Koa();
 
       app.use(() => {
@@ -214,11 +204,10 @@ describe('ctx.onerror(err)', () => {
 
       const server = app.listen();
 
-      return request(server)
-        .get('/')
-        .expect(500)
-        .expect('Content-Type', 'text/plain; charset=utf-8')
-        .expect('Internal Server Error');
+      const response = await request(server).get('/');
+      expect(response.status).toBe(500);
+      expect(response.headers['content-type']).toBe('text/plain; charset=utf-8');
+      expect(response.text).toBe('Internal Server Error');
     });
 
     it('should use res.getHeaderNames() accessor when available', () => {
