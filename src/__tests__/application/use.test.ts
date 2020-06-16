@@ -72,27 +72,25 @@ describe('app.use(fn)', () => {
   });
 
   // https://github.com/koajs/koa/pull/530#issuecomment-148138051
-  it('should catch thrown errors in non-async functions', () => {
+  it('should catch thrown errors in non-async functions', async() => {
     const app = new Koa();
 
     app.use((ctx: Context) => ctx.throw('Not Found', 404));
 
-    return request(app.callback())
-      .get('/')
-      .expect(404);
+    const response = await request(app.callback()).get('/');
+    expect(response.status).toBe(404);
   });
 
-  it('should accept both generator and function middleware', () => {
+  it('should accept both generator and function middleware', async() => {
     process.once('deprecation', () => {}); // silence deprecation message
     const app = new Koa();
 
     app.use((_: Context, next: Function) => next());
     app.use(function * () { this.body = 'generator'; });
 
-    return request(app.callback())
-      .get('/')
-      .expect(200)
-      .expect('generator');
+    const response = await request(app.callback()).get('/');
+    expect(response.status).toBe(200);
+    expect(response.text).toBe('generator');
   });
 
   it('should throw error for non function', () => {
