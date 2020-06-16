@@ -24,7 +24,7 @@ describe('ctx.cookies', () => {
 
     describe('with .signed', () => {
       describe('when no .keys are set', () => {
-        it('should error', () => {
+        it('should error', async() => {
           const app = new Koa();
 
           app.use((ctx: Context) => {
@@ -35,9 +35,8 @@ describe('ctx.cookies', () => {
             }
           });
 
-          return request(app.callback())
-            .get('/')
-            .expect('.keys required for signed cookies');
+          const response = await request(app.callback()).get('/');
+          expect(response.text).toBe('.keys required for signed cookies');
         });
       });
 
@@ -107,10 +106,10 @@ describe('ctx.cookies', () => {
 
       const server = app.listen();
 
-      await request(server)
-        .get('/')
-        .expect('name', 'jon')
-        .expect(204);
+      const response = await request(server).get('/');
+      console.log(response);
+      expect(response.headers.name).toBe('jon');
+      expect(response.status).toBe(204);
     });
   });
 });
