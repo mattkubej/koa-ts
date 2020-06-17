@@ -6,7 +6,7 @@ import statuses from 'statuses';
 
 describe('app.respond', () => {
   describe('when ctx.respond === false', () => {
-    it('should function (ctx)', () => {
+    it('should function (ctx)', async() => {
       const app = new Koa();
 
       app.use((ctx: Context) => {
@@ -24,10 +24,9 @@ describe('app.respond', () => {
 
       const server = app.listen();
 
-      return request(server)
-        .get('/')
-        .expect(200)
-        .expect('lol');
+      const response = await request(server).get('/');
+      expect(response.status).toBe(200);
+      expect(response.text).toBe('lol');
     });
 
     it('should ignore set header after header sent', () => {
@@ -55,7 +54,7 @@ describe('app.respond', () => {
         });
     });
 
-    it('should ignore set status after header sent', () => {
+    it('should ignore set status after header sent', async() => {
       const app = new Koa();
       app.use((ctx: Context) => {
         ctx.body = 'Hello';
@@ -71,10 +70,9 @@ describe('app.respond', () => {
 
       const server = app.listen();
 
-      return request(server)
-        .get('/')
-        .expect(200)
-        .expect('lol');
+      const response = await request(server).get('/');
+      expect(response.status).toBe(200);
+      expect(response.text).toBe('lol');
     });
   });
 
@@ -93,7 +91,7 @@ describe('app.respond', () => {
         .get('/')
         .expect(200);
 
-      expect(res.headers.hasOwnProperty('Content-Type')).toBeFalsy();
+      expect(Object.prototype.hasOwnProperty.call(res.headers, 'Content-Type')).toBeFalsy();
     });
   });
 
@@ -190,21 +188,18 @@ describe('app.respond', () => {
       expect(res.text).toBeUndefined();
     });
 
-    it('should respond with a 404 if no body was set', () => {
+    it('should respond with a 404 if no body was set', async() => {
       const app = new Koa();
 
-      app.use(() => {
-
-      });
+      app.use(() => {});
 
       const server = app.listen();
 
-      return request(server)
-        .head('/')
-        .expect(404);
+      const response = await request(server).head('/');
+      expect(response.status).toBe(404);
     });
 
-    it('should respond with a 200 if body = ""', () => {
+    it('should respond with a 200 if body = ""', async() => {
       const app = new Koa();
 
       app.use((ctx: Context) => {
@@ -213,12 +208,11 @@ describe('app.respond', () => {
 
       const server = app.listen();
 
-      return request(server)
-        .head('/')
-        .expect(200);
+      const response = await request(server).head('/');
+      expect(response.status).toBe(200);
     });
 
-    it('should not overwrite the content-type', () => {
+    it('should not overwrite the content-type', async() => {
       const app = new Koa();
 
       app.use((ctx: Context) => {
@@ -228,27 +222,25 @@ describe('app.respond', () => {
 
       const server = app.listen();
 
-      return request(server)
-        .head('/')
-        .expect('content-type', /application\/javascript/)
-        .expect(200);
+      const response = await request(server).head('/');
+      expect(response.headers['content-type']).toBe('application/javascript; charset=utf-8');
+      expect(response.status).toBe(200);
     });
   });
 
   describe('when no middleware are present', () => {
-    it('should 404', () => {
+    it('should 404', async() => {
       const app = new Koa();
 
       const server = app.listen();
 
-      return request(server)
-        .get('/')
-        .expect(404);
+      const response = await request(server).get('/');
+      expect(response.status).toBe(404);
     });
   });
 
   describe('when res has already been written to', () => {
-    it('should not cause an app error', () => {
+    it('should not cause an app error', async() => {
       const app = new Koa();
 
       app.use((ctx: Context) => {
@@ -262,12 +254,11 @@ describe('app.respond', () => {
 
       const server = app.listen();
 
-      return request(server)
-        .get('/')
-        .expect(200);
+      const response = await request(server).get('/');
+      expect(response.status).toBe(200);
     });
 
-    it('should send the right body', () => {
+    it('should send the right body', async() => {
       const app = new Koa();
 
       app.use((ctx: Context) => {
@@ -285,16 +276,15 @@ describe('app.respond', () => {
 
       const server = app.listen();
 
-      return request(server)
-        .get('/')
-        .expect(200)
-        .expect('HelloGoodbye');
+      const response = await request(server).get('/');
+      expect(response.status).toBe(200);
+      expect(response.text).toBe('HelloGoodbye');
     });
   });
 
   describe('when .body is missing', () => {
     describe('with status=400', () => {
-      it('should respond with the associated status message', () => {
+      it('should respond with the associated status message', async() => {
         const app = new Koa();
 
         app.use((ctx: Context) => {
@@ -303,11 +293,10 @@ describe('app.respond', () => {
 
         const server = app.listen();
 
-        return request(server)
-          .get('/')
-          .expect(400)
-          .expect('Content-Length', '11')
-          .expect('Bad Request');
+        const response = await request(server).get('/');
+        expect(response.status).toBe(400);
+        expect(response.headers['content-length']).toBe('11');
+        expect(response.text).toBe('Bad Request');
       });
     });
 
@@ -326,7 +315,7 @@ describe('app.respond', () => {
           .expect(204)
           .expect('');
 
-        expect(res.headers.hasOwnProperty('content-type')).toBeFalsy();
+        expect(Object.prototype.hasOwnProperty.call(res.headers, 'content-type')).toBeFalsy();
       });
     });
 
@@ -345,7 +334,7 @@ describe('app.respond', () => {
           .expect(205)
           .expect('');
 
-        expect(res.headers.hasOwnProperty('content-type')).toBeFalsy();
+        expect(Object.prototype.hasOwnProperty.call(res.headers, 'content-type')).toBeFalsy();
       });
     });
 
@@ -364,7 +353,7 @@ describe('app.respond', () => {
           .expect(304)
           .expect('');
 
-        expect(res.headers.hasOwnProperty('content-type')).toBeFalsy();
+        expect(Object.prototype.hasOwnProperty.call(res.headers, 'content-type')).toBeFalsy();
       });
     });
 
@@ -409,7 +398,7 @@ describe('app.respond', () => {
     });
 
     describe('with custom status without message', () => {
-      it('should respond with the status code number', () => {
+      it('should respond with the status code number', async() => {
         const app = new Koa();
 
         app.use((ctx: Context) => {
@@ -418,10 +407,9 @@ describe('app.respond', () => {
 
         const server = app.listen();
 
-        return request(server)
-          .get('/')
-          .expect(701)
-          .expect('701');
+        const response = await request(server).get('/');
+        expect(response.status).toBe(701);
+        expect(response.text).toBe('701');
       });
     });
   });
@@ -441,7 +429,7 @@ describe('app.respond', () => {
         .expect(204)
         .expect('');
 
-      expect(res.headers.hasOwnProperty('content-type')).toBeFalsy();
+      expect(Object.prototype.hasOwnProperty.call(res.headers, 'content-type')).toBeFalsy();
     });
 
     it('should respond 204 with status=200', async() => {
@@ -459,7 +447,7 @@ describe('app.respond', () => {
         .expect(204)
         .expect('');
 
-      expect(res.headers.hasOwnProperty('content-type')).toBeFalsy();
+      expect(Object.prototype.hasOwnProperty.call(res.headers, 'content-type')).toBeFalsy();
     });
 
     it('should respond 205 with status=205', async() => {
@@ -477,7 +465,7 @@ describe('app.respond', () => {
         .expect(205)
         .expect('');
 
-      expect(res.headers.hasOwnProperty('content-type')).toBeFalsy();
+      expect(Object.prototype.hasOwnProperty.call(res.headers, 'content-type')).toBeFalsy();
     });
 
     it('should respond 304 with status=304', async() => {
@@ -495,12 +483,12 @@ describe('app.respond', () => {
         .expect(304)
         .expect('');
 
-      expect(res.headers.hasOwnProperty('content-type')).toBeFalsy();
+      expect(Object.prototype.hasOwnProperty.call(res.headers, 'content-type')).toBeFalsy();
     });
   });
 
   describe('when .body is a string', () => {
-    it('should respond', () => {
+    it('should respond', async() => {
       const app = new Koa();
 
       app.use((ctx: Context) => {
@@ -509,14 +497,13 @@ describe('app.respond', () => {
 
       const server = app.listen();
 
-      return request(server)
-        .get('/')
-        .expect('Hello');
+      const response = await request(server).get('/');
+      expect(response.text).toBe('Hello');
     });
   });
 
   describe('when .body is a Buffer', () => {
-    it('should respond', () => {
+    it('should respond', async() => {
       const app = new Koa();
 
       app.use((ctx: Context) => {
@@ -525,10 +512,9 @@ describe('app.respond', () => {
 
       const server = app.listen();
 
-      return request(server)
-        .get('/')
-        .expect(200)
-        .expect(Buffer.from('Hello'));
+      const response = await request(server).get('/');
+      expect(response.status).toBe(200);
+      expect(response.body).toMatchObject(Buffer.from([72, 101, 108, 108, 111]));
     });
   });
 
@@ -548,7 +534,7 @@ describe('app.respond', () => {
         .expect('Content-Type', 'application/json; charset=utf-8');
 
       const pkg = require('../../../package');
-      expect(res.headers.hasOwnProperty('content-length')).toBeFalsy();
+      expect(Object.prototype.hasOwnProperty.call(res.headers, 'content-length')).toBeFalsy();
       expect(res.body).toStrictEqual(pkg);
     });
 
@@ -568,7 +554,7 @@ describe('app.respond', () => {
         .expect('Content-Type', 'application/json; charset=utf-8');
 
       const pkg = require('../../../package');
-      expect(res.headers.hasOwnProperty('content-length')).toBeFalsy();
+      expect(Object.prototype.hasOwnProperty.call(res.headers, 'content-length')).toBeFalsy();
       expect(res.body).toStrictEqual(pkg);
     });
 
@@ -588,7 +574,7 @@ describe('app.respond', () => {
         .expect('Content-Type', 'application/json; charset=utf-8');
 
       const pkg = require('../../../package');
-      expect(res.headers.hasOwnProperty('content-length')).toBeTruthy();
+      expect(Object.prototype.hasOwnProperty.call(res.headers, 'content-length')).toBeTruthy();
       expect(res.body).toStrictEqual(pkg);
     });
 
@@ -611,30 +597,25 @@ describe('app.respond', () => {
           .expect('Content-Type', 'application/json; charset=utf-8');
 
         const pkg = require('../../../package');
-        expect(res.headers.hasOwnProperty('content-length')).toBeTruthy();
+        expect(Object.prototype.hasOwnProperty.call(res.headers, 'content-length')).toBeTruthy();
         expect(res.body).toStrictEqual(pkg);
       });
 
-    it('should handle errors', () => {
-      return new Promise(done => {
-        const app = new Koa();
-
-        app.use((ctx: Context) => {
-          ctx.set('Content-Type', 'application/json; charset=utf-8');
-          ctx.body = fs.createReadStream('does not exist');
-        });
-
-        const server = app.listen();
-
-        request(server)
-          .get('/')
-          .expect('Content-Type', 'text/plain; charset=utf-8')
-          .expect(404)
-          .end(done);
+    it('should handle errors', async() => {
+      const app = new Koa();
+      app.use((ctx: Context) => {
+        ctx.set('Content-Type', 'application/json; charset=utf-8');
+        ctx.body = fs.createReadStream('does not exist');
       });
+
+      const server = app.listen();
+
+      const response = await request(server).get('/');
+      expect(response.headers['content-type']).toBe('text/plain; charset=utf-8');
+      expect(response.status).toBe(404);
     });
 
-    it('should handle errors when no content status', () => {
+    it('should handle errors when no content status', async() => {
       const app = new Koa();
 
       app.use((ctx: Context) => {
@@ -644,33 +625,28 @@ describe('app.respond', () => {
 
       const server = app.listen();
 
-      return request(server)
-        .get('/')
-        .expect(204);
+      const response = await request(server).get('/');
+      expect(response.status).toBe(204);
     });
 
-    it('should handle all intermediate stream body errors', () => {
-      return new Promise(done => {
-        const app = new Koa();
+    it('should handle all intermediate stream body errors', async() => {
+      const app = new Koa();
 
-        app.use((ctx: Context) => {
-          ctx.body = fs.createReadStream('does not exist');
-          ctx.body = fs.createReadStream('does not exist');
-          ctx.body = fs.createReadStream('does not exist');
-        });
-
-        const server = app.listen();
-
-        request(server)
-          .get('/')
-          .expect(404)
-          .end(done);
+      app.use((ctx: Context) => {
+        ctx.body = fs.createReadStream('does not exist');
+        ctx.body = fs.createReadStream('does not exist');
+        ctx.body = fs.createReadStream('does not exist');
       });
+
+      const server = app.listen();
+
+      const response = await request(server).get('/');
+      expect(response.status).toBe(404);
     });
   });
 
   describe('when .body is an Object', () => {
-    it('should respond with json', () => {
+    it('should respond with json', async() => {
       const app = new Koa();
 
       app.use((ctx: Context) => {
@@ -679,16 +655,15 @@ describe('app.respond', () => {
 
       const server = app.listen();
 
-      return request(server)
-        .get('/')
-        .expect('Content-Type', 'application/json; charset=utf-8')
-        .expect('{"hello":"world"}');
+      const response = await request(server).get('/');
+      expect(response.headers['content-type']).toBe('application/json; charset=utf-8');
+      expect(response.body).toMatchObject({ hello: 'world' });
     });
   });
 
   describe('when an error occurs', () => {
     it('should emit "error" on the app', () => {
-      return new Promise(done => {
+      return new Promise(resolve => {
         const app = new Koa();
 
         app.use(() => {
@@ -697,7 +672,7 @@ describe('app.respond', () => {
 
         app.on('error', err => {
           expect(err.message).toBe('boom');
-          done();
+          resolve();
         });
 
         request(app.callback())
@@ -707,7 +682,7 @@ describe('app.respond', () => {
     });
 
     describe('with an .expose property', () => {
-      it('should expose the message', () => {
+      it('should expose the message', async() => {
         const app = new Koa();
 
         app.use(() => {
@@ -717,14 +692,14 @@ describe('app.respond', () => {
           throw err;
         });
 
-        return request(app.callback())
-          .get('/')
-          .expect(403, 'sorry!');
+        const response = await request(app.callback()).get('/');
+        expect(response.status).toBe(403);
+        expect(response.text).toBe('sorry!');
       });
     });
 
     describe('with a .status property', () => {
-      it('should respond with .status', () => {
+      it('should respond with .status', async() => {
         const app = new Koa();
 
         app.use(() => {
@@ -733,13 +708,13 @@ describe('app.respond', () => {
           throw err;
         });
 
-        return request(app.callback())
-          .get('/')
-          .expect(403, 'Forbidden');
+        const response = await request(app.callback()).get('/');
+        expect(response.status).toBe(403);
+        expect(response.text).toBe('Forbidden');
       });
     });
 
-    it('should respond with 500', () => {
+    it('should respond with 500', async() => {
       const app = new Koa();
 
       app.use(() => {
@@ -748,12 +723,12 @@ describe('app.respond', () => {
 
       const server = app.listen();
 
-      return request(server)
-        .get('/')
-        .expect(500, 'Internal Server Error');
+      const response = await request(server).get('/');
+      expect(response.status).toBe(500);
+      expect(response.text).toBe('Internal Server Error');
     });
 
-    it('should be catchable', () => {
+    it('should be catchable', async() => {
       const app = new Koa();
 
       app.use((ctx: Context, next: Function) => {
@@ -770,14 +745,14 @@ describe('app.respond', () => {
 
       const server = app.listen();
 
-      return request(server)
-        .get('/')
-        .expect(200, 'Got error');
+      const response = await request(server).get('/');
+      expect(response.status).toBe(200);
+      expect(response.text).toBe('Got error');
     });
   });
 
   describe('when status and body property', () => {
-    it('should 200', () => {
+    it('should 200', async() => {
       const app = new Koa();
 
       app.use((ctx: Context) => {
@@ -788,10 +763,9 @@ describe('app.respond', () => {
 
       const server = app.listen();
 
-      return request(server)
-        .get('/')
-        .expect(200)
-        .expect('hello');
+      const response = await request(server).get('/');
+      expect(response.status).toBe(200);
+      expect(response.text).toBe('hello');
     });
 
     it('should 204', async() => {
@@ -810,7 +784,7 @@ describe('app.respond', () => {
         .get('/')
         .expect(204);
 
-      expect(res.headers.hasOwnProperty('content-type')).toBeFalsy();
+      expect(Object.prototype.hasOwnProperty.call(res.headers, 'content-type')).toBeFalsy();
     });
   });
 
@@ -825,11 +799,10 @@ describe('app.respond', () => {
 
       const server = app.listen();
 
-      return request(server)
-        .get('/')
-        .expect(404)
-        .expect('')
-        .expect({});
+      const response = await request(server).get('/');
+      expect(response.status).toBe(404);
+      expect(response.text).toBe('');
+      expect(response.body).toMatchObject({});
     });
     it('should respond with correct headers', async() => {
       const app = new Koa();
@@ -847,7 +820,7 @@ describe('app.respond', () => {
         .expect('')
         .expect({});
 
-      expect(res.headers.hasOwnProperty('content-type')).toBeFalsy();
+      expect(Object.prototype.hasOwnProperty.call(res.headers, 'content-type')).toBeFalsy();
     });
   });
 });
