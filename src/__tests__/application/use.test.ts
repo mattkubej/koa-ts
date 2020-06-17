@@ -102,10 +102,10 @@ describe('app.use(fn)', () => {
   });
 
   it('should output deprecation message for generator functions', () => {
-    return new Promise(done => {
+    return new Promise(resolve => {
       process.once('deprecation', message => {
         expect(/Support for generators will be removed/.test(String(message))).toBeTruthy();
-        done();
+        resolve();
       });
 
       const app = new Koa();
