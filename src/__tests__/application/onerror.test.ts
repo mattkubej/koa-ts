@@ -9,7 +9,7 @@ describe('app.onerror(err)', () => {
 
     expect(() => {
       app.onerror('foo');
-    }).toThrow(new TypeError('non-error thrown: \"foo\"'));
+    }).toThrow(new TypeError('non-error thrown: "foo"'));
   });
 
   it('should do nothing if status is 404', () => {
