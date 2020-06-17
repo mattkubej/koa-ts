@@ -4,7 +4,7 @@ import Context from '../../context';
 
 describe('app', () => {
   it('should handle socket errors', () => {
-    return new Promise(done => {
+    return new Promise(resolve => {
       const app = new Koa();
 
       app.use((ctx: Context) => {
@@ -14,7 +14,7 @@ describe('app', () => {
 
       app.on('error', err => {
         expect(err.message).toBe('boom');
-        done();
+        resolve();
       });
 
       request(app.callback()).get('/').end(() => {});
@@ -22,29 +22,26 @@ describe('app', () => {
   });
 
   it('should not .writeHead when !socket.writable', () => {
-    return new Promise(done => {
+    return new Promise(resolve => {
       const app = new Koa();
 
       app.use((ctx: Context) => {
-      // set .writable to false, TS hack
+        // set .writable to false, TS hack
         (ctx.socket as any).writable = false;
         ctx.status = 204;
         // throw if .writeHead or .end is called
-        ctx.res.writeHead =
-      ctx.res.end = () => {
-        fail('response sent');
-      };
+        ctx.res.writeHead = ctx.res.end = () => {
+          throw new Error('response sent');
+        };
 
         // hack to cancel request second later
         setTimeout(() => {
           ctx.req.destroy();
-          done();
+          resolve();
         }, 1);
       });
 
-      request(app.callback())
-        .get('/')
-        .end(() => {});
+      expect(() => request(app.callback()).get('/').end(() => {})).not.toThrow();
     });
   });
 
