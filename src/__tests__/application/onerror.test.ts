@@ -1,8 +1,11 @@
 import Koa, { KoaError } from '../../application';
-import mm from 'mm';
+
+const spy = jest.spyOn(global.console, 'error').mockImplementationOnce(() => {});
 
 describe('app.onerror(err)', () => {
-  afterEach(mm.restore);
+  afterEach(() => {
+    spy.mockReset();
+  });
 
   it('should throw an error if a non-error is given', () => {
     const app = new Koa();
@@ -18,10 +21,8 @@ describe('app.onerror(err)', () => {
 
     err.status = 404;
 
-    let called = false;
-    mm(console, 'error', () => { called = true; });
     app.onerror(err);
-    expect(!called).toBeTruthy();
+    expect(spy).not.toHaveBeenCalled();
   });
 
   it('should do nothing if .silent', () => {
@@ -29,10 +30,8 @@ describe('app.onerror(err)', () => {
     app.silent = true;
     const err = new Error();
 
-    let called = false;
-    mm(console, 'error', () => { called = true; });
     app.onerror(err);
-    expect(!called).toBeTruthy();
+    expect(spy).not.toHaveBeenCalled();
   });
 
   it('should log the error to stderr', () => {
@@ -42,15 +41,11 @@ describe('app.onerror(err)', () => {
     const err = new Error();
     err.stack = 'Foo';
 
-    let msg = '';
-    mm(console, 'error', (input: string) => {
-      if (input) msg = input;
-    });
     app.onerror(err);
-    expect(msg).toBe('  Foo');
+    expect(spy).toHaveBeenCalledWith('  Foo');
   });
 
-  it('should use err.toString() instad of err.stack', () => {
+  it('should use err.toString() instead of err.stack', () => {
     const app = new Koa();
     app.env = 'dev';
 
@@ -58,12 +53,8 @@ describe('app.onerror(err)', () => {
     err.stack = null;
 
     app.onerror(err);
-
-    let msg = '';
-    mm(console, 'error', (input: string) => {
-      if (input) msg = input;
-    });
-    app.onerror(err);
-    expect(msg).toBe('  Error: mock stack null');
+    expect(spy).toHaveBeenCalledWith();
+    expect(spy).toHaveBeenCalledWith('  Error: mock stack null');
+    expect(spy).toHaveBeenCalledWith();
   });
 });
