@@ -4,6 +4,9 @@ import request from 'supertest';
 import fs from 'fs';
 import statuses from 'statuses';
 
+// silence console.error during tests
+jest.spyOn(global.console, 'error').mockImplementation(() => {});
+
 describe('app.respond', () => {
   describe('when ctx.respond === false', () => {
     it('should function (ctx)', async() => {
