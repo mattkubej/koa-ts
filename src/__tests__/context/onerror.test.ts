@@ -3,6 +3,9 @@ import Koa, { KoaError } from '../../application';
 import context from '../helpers/context';
 import Context from '../../context';
 
+// silence console.error during tests
+jest.spyOn(global.console, 'error').mockImplementation(() => {});
+
 describe('ctx.onerror(err)', () => {
   it('should respond', async() => {
     const app = new Koa();
