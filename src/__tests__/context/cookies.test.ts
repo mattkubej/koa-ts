@@ -107,7 +107,6 @@ describe('ctx.cookies', () => {
       const server = app.listen();
 
       const response = await request(server).get('/');
-      console.log(response);
       expect(response.headers.name).toBe('jon');
       expect(response.status).toBe(204);
     });
