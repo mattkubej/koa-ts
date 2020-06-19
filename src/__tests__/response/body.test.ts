@@ -102,7 +102,7 @@ describe('res.body=', () => {
   describe('when a stream is given', () => {
     it('should default to an octet stream', () => {
       const res = response();
-      res.body = fs.createReadStream('LICENSE');
+      res.body = fs.createReadStream('package.json');
       expect('application/octet-stream').toBe(res.header['content-type']);
     });
 
