@@ -205,8 +205,7 @@ export default class Response {
     this.set('Last-Modified', val.toUTCString());
   }
 
-  // TODO: set and get have to match types
-  get lastModified(): Date | string {
+  get lastModified(): string | Date {
     const date = <string> this.get('last-modified');
     if (date) return new Date(date);
   }
