@@ -15,7 +15,7 @@ import Context from './context';
 import Request from './request';
 import Response from './response';
 
-import only from './utils/only';
+import only from 'only';
 import isError from './utils/isError';
 
 const debug = Debug('koa:application');

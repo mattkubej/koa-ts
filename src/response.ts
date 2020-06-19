@@ -14,7 +14,7 @@ import onFinish from 'on-finished';
 import encodeUrl from 'encodeurl';
 import escape from 'escape-html';
 
-import only from './utils/only';
+import only from 'only';
 
 import Application from './application';
 import Context from './context';

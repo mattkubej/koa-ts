@@ -10,7 +10,7 @@ import contentType from 'content-type';
 import accepts from 'accepts';
 import typeis from 'type-is';
 import fresh from 'fresh';
-import only from './utils/only';
+import only from 'only';
 
 import Application from './application';
 import Context from './context';
