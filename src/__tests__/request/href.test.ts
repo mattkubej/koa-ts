@@ -24,7 +24,7 @@ describe('ctx.href', () => {
       app.use((ctx: Context) => {
         ctx.body = ctx.href;
       });
-      app.listen(function() {
+      const server = app.listen(function() {
         const address = this.address();
         http.get({
           host: 'localhost',
@@ -36,6 +36,7 @@ describe('ctx.href', () => {
           res.setEncoding('utf8');
           res.on('data', s => buf += s);
           res.on('end', () => {
+            server.close();
             expect(buf).toBe('http://example.com/foo');
             resolve();
           });

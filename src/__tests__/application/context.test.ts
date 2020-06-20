@@ -13,9 +13,12 @@ describe('app.context', () => {
       ctx.status = 204;
     });
 
-    return request(app1.listen())
+    const server = app1.listen();
+
+    return request(server)
       .get('/')
-      .expect(204);
+      .expect(204)
+      .then(() => { server.close(); });
   });
 
   it('should not affect the original prototype', () => {
@@ -24,8 +27,11 @@ describe('app.context', () => {
       ctx.status = 204;
     });
 
-    return request(app2.listen())
+    const server = app2.listen();
+
+    return request(server)
       .get('/')
-      .expect(204);
+      .expect(204)
+      .then(() => { server.close(); });
   });
 });

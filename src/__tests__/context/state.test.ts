@@ -14,6 +14,7 @@ describe('ctx.state', () => {
 
     return request(server)
       .get('/')
-      .expect(404);
+      .expect(404)
+      .then(() => { server.close(); });
   });
 });
