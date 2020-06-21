@@ -33,6 +33,7 @@ describe('res.writable', () => {
           const responses = Buffer.concat(datas).toString();
           expect(/request 1, writable: true/.test(responses)).toBeTruthy();
           expect(/request 2, writable: true/.test(responses)).toBeTruthy();
+          server.close();
           resolve();
         });
       });
@@ -40,10 +41,17 @@ describe('res.writable', () => {
   });
 
   describe('when socket closed before response sent', () => {
+    let client: net.Socket;
+    let server: http.Server;
+    afterEach(() => {
+      client.destroy();
+      server.close();
+    });
+
     function requestClosed(server: http.Server) {
       const port = (server.address() as net.AddressInfo).port;
       const buf = Buffer.from('GET / HTTP/1.1\r\nHost: localhost:' + port + '\r\nConnection: keep-alive\r\n\r\n');
-      const client = net.connect(port);
+      client = net.connect(port);
       setImmediate(() => {
         client.write(buf);
         client.end();
@@ -60,22 +68,30 @@ describe('res.writable', () => {
               resolve('pass');
             });
         });
-        const server = app.listen();
+        server = app.listen();
         requestClosed(server);
       })).resolves.toBe('pass');
     });
   });
 
   describe('when response finished', () => {
+    let client: net.Socket;
+    let server: http.Server;
+    afterEach(() => {
+      client.destroy();
+      server.close();
+    });
+
     function request(server: http.Server) {
       const port = (server.address() as net.AddressInfo).port;
       const buf = Buffer.from('GET / HTTP/1.1\r\nHost: localhost:' + port + '\r\nConnection: keep-alive\r\n\r\n');
-      const client = net.connect(port);
+      client = net.connect(port);
       setImmediate(() => {
         client.write(buf);
       });
       setTimeout(() => {
         client.end();
+        server.close();
       }, 100);
     }
 
@@ -87,7 +103,7 @@ describe('res.writable', () => {
           if (ctx.writable) return resolve(new Error('ctx.writable should not be true'));
           resolve('pass');
         });
-        const server = app.listen();
+        server = app.listen();
         request(server);
       })).resolves.toBe('pass');
     });
