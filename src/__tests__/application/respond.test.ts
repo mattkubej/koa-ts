@@ -28,11 +28,12 @@ describe('app.respond', () => {
       const server = app.listen();
 
       const response = await request(server).get('/');
+      server.close();
       expect(response.status).toBe(200);
       expect(response.text).toBe('lol');
     });
 
-    it('should ignore set header after header sent', () => {
+    it('should ignore set header after header sent', async() => {
       const app = new Koa();
       app.use((ctx: Context) => {
         ctx.body = 'Hello';
@@ -48,13 +49,11 @@ describe('app.respond', () => {
 
       const server = app.listen();
 
-      return request(server)
-        .get('/')
-        .expect(200)
-        .expect('lol')
-        .expect((res: Response) => {
-          expect((res.headers as any).foo).toBeUndefined();
-        });
+      const response = await request(server).get('/');
+      server.close();
+      expect(response.status).toBe(200);
+      expect(response.text).toBe('lol');
+      expect(response.headers.foo).toBeUndefined();
     });
 
     it('should ignore set status after header sent', async() => {
@@ -74,6 +73,7 @@ describe('app.respond', () => {
       const server = app.listen();
 
       const response = await request(server).get('/');
+      server.close();
       expect(response.status).toBe(200);
       expect(response.text).toBe('lol');
     });
@@ -90,10 +90,9 @@ describe('app.respond', () => {
 
       const server = app.listen();
 
-      const res = await request(server)
-        .get('/')
-        .expect(200);
-
+      const res = await request(server).get('/');
+      server.close();
+      expect(res.status).toBe(200);
       expect(Object.prototype.hasOwnProperty.call(res.headers, 'Content-Type')).toBeFalsy();
     });
   });
@@ -108,10 +107,9 @@ describe('app.respond', () => {
 
       const server = app.listen();
 
-      const res = await request(server)
-        .head('/')
-        .expect(200);
-
+      const res = await request(server).head('/');
+      server.close();
+      expect(res.status).toBe(200);
       expect(res.headers['content-type']).toBe('text/plain; charset=utf-8');
       expect(res.headers['content-length']).toBe('5');
       expect(res.text).toBeUndefined();
@@ -126,10 +124,9 @@ describe('app.respond', () => {
 
       const server = app.listen();
 
-      const res = await request(server)
-        .head('/')
-        .expect(200);
-
+      const res = await request(server).head('/');
+      server.close();
+      expect(res.status).toBe(200);
       expect(res.headers['content-type']).toBe('application/json; charset=utf-8');
       expect(res.headers['content-length']).toBe('17');
       expect(res.text).toBeUndefined();
@@ -144,10 +141,9 @@ describe('app.respond', () => {
 
       const server = app.listen();
 
-      const res = await request(server)
-        .head('/')
-        .expect(200);
-
+      const res = await request(server).head('/');
+      server.close();
+      expect(res.status).toBe(200);
       expect(res.headers['content-type']).toBe('text/plain; charset=utf-8');
       expect(res.headers['content-length']).toBe('11');
       expect(res.text).toBeUndefined();
@@ -162,10 +158,9 @@ describe('app.respond', () => {
 
       const server = app.listen();
 
-      const res = await request(server)
-        .head('/')
-        .expect(200);
-
+      const res = await request(server).head('/');
+      server.close();
+      expect(res.status).toBe(200);
       expect(res.headers['content-type']).toBe('application/octet-stream');
       expect(res.headers['content-length']).toBe('11');
       expect(res.text).toBeUndefined();
@@ -183,10 +178,9 @@ describe('app.respond', () => {
 
       const server = app.listen();
 
-      const res = await request(server)
-        .head('/')
-        .expect(200);
-
+      const res = await request(server).head('/');
+      server.close();
+      expect(res.status).toBe(200);
       expect(res.header['content-length']).toBe(String(length));
       expect(res.text).toBeUndefined();
     });
@@ -199,6 +193,7 @@ describe('app.respond', () => {
       const server = app.listen();
 
       const response = await request(server).head('/');
+      server.close();
       expect(response.status).toBe(404);
     });
 
@@ -212,6 +207,7 @@ describe('app.respond', () => {
       const server = app.listen();
 
       const response = await request(server).head('/');
+      server.close();
       expect(response.status).toBe(200);
     });
 
@@ -226,6 +222,7 @@ describe('app.respond', () => {
       const server = app.listen();
 
       const response = await request(server).head('/');
+      server.close();
       expect(response.headers['content-type']).toBe('application/javascript; charset=utf-8');
       expect(response.status).toBe(200);
     });
@@ -238,6 +235,7 @@ describe('app.respond', () => {
       const server = app.listen();
 
       const response = await request(server).get('/');
+      server.close();
       expect(response.status).toBe(404);
     });
   });
@@ -258,6 +256,7 @@ describe('app.respond', () => {
       const server = app.listen();
 
       const response = await request(server).get('/');
+      server.close();
       expect(response.status).toBe(200);
     });
 
@@ -280,6 +279,7 @@ describe('app.respond', () => {
       const server = app.listen();
 
       const response = await request(server).get('/');
+      server.close();
       expect(response.status).toBe(200);
       expect(response.text).toBe('HelloGoodbye');
     });
@@ -297,6 +297,7 @@ describe('app.respond', () => {
         const server = app.listen();
 
         const response = await request(server).get('/');
+        server.close();
         expect(response.status).toBe(400);
         expect(response.headers['content-length']).toBe('11');
         expect(response.text).toBe('Bad Request');
@@ -313,11 +314,10 @@ describe('app.respond', () => {
 
         const server = app.listen();
 
-        const res = await request(server)
-          .get('/')
-          .expect(204)
-          .expect('');
-
+        const res = await request(server).get('/');
+        server.close();
+        expect(res.status).toBe(204);
+        expect(res.text).toBe('');
         expect(Object.prototype.hasOwnProperty.call(res.headers, 'content-type')).toBeFalsy();
       });
     });
@@ -332,11 +332,10 @@ describe('app.respond', () => {
 
         const server = app.listen();
 
-        const res = await request(server)
-          .get('/')
-          .expect(205)
-          .expect('');
-
+        const res = await request(server).get('/');
+        server.close();
+        expect(res.status).toBe(205);
+        expect(res.text).toBe('');
         expect(Object.prototype.hasOwnProperty.call(res.headers, 'content-type')).toBeFalsy();
       });
     });
@@ -351,11 +350,10 @@ describe('app.respond', () => {
 
         const server = app.listen();
 
-        const res = await request(server)
-          .get('/')
-          .expect(304)
-          .expect('');
-
+        const res = await request(server).get('/');
+        server.close();
+        expect(res.status).toBe(304);
+        expect(res.text).toBe('');
         expect(Object.prototype.hasOwnProperty.call(res.headers, 'content-type')).toBeFalsy();
       });
     });
@@ -371,11 +369,10 @@ describe('app.respond', () => {
 
         const server = app.listen();
 
-        const res = await request(server)
-          .get('/')
-          .expect(700)
-          .expect('custom status');
-
+        const res = await request(server).get('/');
+        server.close();
+        expect(res.status).toBe(700);
+        expect(res.text).toBe('custom status');
         expect(res.res.statusMessage).toBe('custom status');
       });
     });
@@ -391,11 +388,10 @@ describe('app.respond', () => {
 
         const server = app.listen();
 
-        const res = await request(server)
-          .get('/')
-          .expect(200)
-          .expect('ok');
-
+        const res = await request(server).get('/');
+        server.close();
+        expect(res.status).toBe(200);
+        expect(res.text).toBe('ok');
         expect(res.res.statusMessage).toBe('ok');
       });
     });
@@ -411,6 +407,7 @@ describe('app.respond', () => {
         const server = app.listen();
 
         const response = await request(server).get('/');
+        server.close();
         expect(response.status).toBe(701);
         expect(response.text).toBe('701');
       });
@@ -427,11 +424,10 @@ describe('app.respond', () => {
 
       const server = app.listen();
 
-      const res = await request(server)
-        .get('/')
-        .expect(204)
-        .expect('');
-
+      const res = await request(server).get('/');
+      server.close();
+      expect(res.status).toBe(204);
+      expect(res.text).toBe('');
       expect(Object.prototype.hasOwnProperty.call(res.headers, 'content-type')).toBeFalsy();
     });
 
@@ -445,11 +441,10 @@ describe('app.respond', () => {
 
       const server = app.listen();
 
-      const res = await request(server)
-        .get('/')
-        .expect(204)
-        .expect('');
-
+      const res = await request(server).get('/');
+      server.close();
+      expect(res.status).toBe(204);
+      expect(res.text).toBe('');
       expect(Object.prototype.hasOwnProperty.call(res.headers, 'content-type')).toBeFalsy();
     });
 
@@ -463,11 +458,10 @@ describe('app.respond', () => {
 
       const server = app.listen();
 
-      const res = await request(server)
-        .get('/')
-        .expect(205)
-        .expect('');
-
+      const res = await request(server).get('/');
+      server.close();
+      expect(res.status).toBe(205);
+      expect(res.text).toBe('');
       expect(Object.prototype.hasOwnProperty.call(res.headers, 'content-type')).toBeFalsy();
     });
 
@@ -481,11 +475,10 @@ describe('app.respond', () => {
 
       const server = app.listen();
 
-      const res = await request(server)
-        .get('/')
-        .expect(304)
-        .expect('');
-
+      const res = await request(server).get('/');
+      server.close();
+      expect(res.status).toBe(304);
+      expect(res.text).toBe('');
       expect(Object.prototype.hasOwnProperty.call(res.headers, 'content-type')).toBeFalsy();
     });
   });
@@ -501,6 +494,7 @@ describe('app.respond', () => {
       const server = app.listen();
 
       const response = await request(server).get('/');
+      server.close();
       expect(response.text).toBe('Hello');
     });
   });
@@ -516,6 +510,7 @@ describe('app.respond', () => {
       const server = app.listen();
 
       const response = await request(server).get('/');
+      server.close();
       expect(response.status).toBe(200);
       expect(response.body).toMatchObject(Buffer.from([72, 101, 108, 108, 111]));
     });
@@ -532,10 +527,9 @@ describe('app.respond', () => {
 
       const server = app.listen();
 
-      const res = await request(server)
-        .get('/')
-        .expect('Content-Type', 'application/json; charset=utf-8');
-
+      const res = await request(server).get('/');
+      server.close();
+      expect(res.headers['content-type']).toBe('application/json; charset=utf-8');
       const pkg = require('../../../package');
       expect(Object.prototype.hasOwnProperty.call(res.headers, 'content-length')).toBeFalsy();
       expect(res.body).toStrictEqual(pkg);
@@ -552,10 +546,9 @@ describe('app.respond', () => {
 
       const server = app.listen();
 
-      const res = await request(server)
-        .get('/')
-        .expect('Content-Type', 'application/json; charset=utf-8');
-
+      const res = await request(server).get('/');
+      server.close();
+      expect(res.headers['content-type']).toBe('application/json; charset=utf-8');
       const pkg = require('../../../package');
       expect(Object.prototype.hasOwnProperty.call(res.headers, 'content-length')).toBeFalsy();
       expect(res.body).toStrictEqual(pkg);
@@ -572,10 +565,9 @@ describe('app.respond', () => {
 
       const server = app.listen();
 
-      const res = await request(server)
-        .get('/')
-        .expect('Content-Type', 'application/json; charset=utf-8');
-
+      const res = await request(server).get('/');
+      server.close();
+      expect(res.headers['content-type']).toBe('application/json; charset=utf-8');
       const pkg = require('../../../package');
       expect(Object.prototype.hasOwnProperty.call(res.headers, 'content-length')).toBeTruthy();
       expect(res.body).toStrictEqual(pkg);
@@ -595,10 +587,9 @@ describe('app.respond', () => {
 
         const server = app.listen();
 
-        const res = await request(server)
-          .get('/')
-          .expect('Content-Type', 'application/json; charset=utf-8');
-
+        const res = await request(server).get('/');
+        server.close();
+        expect(res.headers['content-type']).toBe('application/json; charset=utf-8');
         const pkg = require('../../../package');
         expect(Object.prototype.hasOwnProperty.call(res.headers, 'content-length')).toBeTruthy();
         expect(res.body).toStrictEqual(pkg);
@@ -614,6 +605,7 @@ describe('app.respond', () => {
       const server = app.listen();
 
       const response = await request(server).get('/');
+      server.close();
       expect(response.headers['content-type']).toBe('text/plain; charset=utf-8');
       expect(response.status).toBe(404);
     });
@@ -629,6 +621,7 @@ describe('app.respond', () => {
       const server = app.listen();
 
       const response = await request(server).get('/');
+      server.close();
       expect(response.status).toBe(204);
     });
 
@@ -644,6 +637,7 @@ describe('app.respond', () => {
       const server = app.listen();
 
       const response = await request(server).get('/');
+      server.close();
       expect(response.status).toBe(404);
     });
   });
@@ -659,6 +653,7 @@ describe('app.respond', () => {
       const server = app.listen();
 
       const response = await request(server).get('/');
+      server.close();
       expect(response.headers['content-type']).toBe('application/json; charset=utf-8');
       expect(response.body).toMatchObject({ hello: 'world' });
     });
@@ -727,6 +722,7 @@ describe('app.respond', () => {
       const server = app.listen();
 
       const response = await request(server).get('/');
+      server.close();
       expect(response.status).toBe(500);
       expect(response.text).toBe('Internal Server Error');
     });
@@ -749,6 +745,7 @@ describe('app.respond', () => {
       const server = app.listen();
 
       const response = await request(server).get('/');
+      server.close();
       expect(response.status).toBe(200);
       expect(response.text).toBe('Got error');
     });
@@ -767,6 +764,7 @@ describe('app.respond', () => {
       const server = app.listen();
 
       const response = await request(server).get('/');
+      server.close();
       expect(response.status).toBe(200);
       expect(response.text).toBe('hello');
     });
@@ -783,10 +781,9 @@ describe('app.respond', () => {
 
       const server = app.listen();
 
-      const res = await request(server)
-        .get('/')
-        .expect(204);
-
+      const res = await request(server).get('/');
+      server.close();
+      expect(res.status).toBe(204);
       expect(Object.prototype.hasOwnProperty.call(res.headers, 'content-type')).toBeFalsy();
     });
   });
@@ -803,6 +800,7 @@ describe('app.respond', () => {
       const server = app.listen();
 
       const response = await request(server).get('/');
+      server.close();
       expect(response.status).toBe(404);
       expect(response.text).toBe('');
       expect(response.body).toMatchObject({});
@@ -817,12 +815,11 @@ describe('app.respond', () => {
 
       const server = app.listen();
 
-      const res = await request(server)
-        .get('/')
-        .expect(401)
-        .expect('')
-        .expect({});
-
+      const res = await request(server).get('/');
+      server.close();
+      expect(res.status).toBe(401);
+      expect(res.text).toBe('');
+      expect(res.body).toStrictEqual({});
       expect(Object.prototype.hasOwnProperty.call(res.headers, 'content-type')).toBeFalsy();
     });
   });
