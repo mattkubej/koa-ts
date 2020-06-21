@@ -4,7 +4,7 @@ import Context from '../../context';
 import http from 'http';
 
 describe('ctx.flushHeaders()', () => {
-  it('should set headersSent', () => {
+  it('should set headersSent', async() => {
     const app = new Koa();
 
     app.use((ctx: Context) => {
@@ -16,10 +16,10 @@ describe('ctx.flushHeaders()', () => {
 
     const server = app.listen();
 
-    return request(server)
-      .get('/')
-      .expect(200)
-      .expect('Body');
+    const response = await request(server).get('/');
+    server.close();
+    expect(response.status).toBe(200);
+    expect(response.text).toBe('Body');
   });
 
   it('should allow a response afterwards', async() => {
@@ -34,6 +34,7 @@ describe('ctx.flushHeaders()', () => {
 
     const server = app.listen();
     const response = await request(server).get('/');
+    server.close();
     expect(response.status).toBe(200);
     expect(response.headers['content-type']).toBe('text/plain');
     expect(response.text).toBe('Body');
@@ -51,6 +52,7 @@ describe('ctx.flushHeaders()', () => {
 
     const server = app.listen();
     const response = await request(server).get('/');
+    server.close();
     expect(response.status).toBe(401);
     expect(response.headers['content-type']).toBe('text/plain');
     expect(response.text).toBe('Body');
@@ -70,16 +72,16 @@ describe('ctx.flushHeaders()', () => {
     });
 
     const server = app.listen();
-    const res = await request(server)
-      .get('/')
-      .expect(401)
-      .expect('Content-Type', 'text/plain');
-
+    const res = await request(server).get('/');
+    server.close();
+    expect(res.status).toBe(401);
+    expect(res.headers['content-type']).toBe('text/plain');
     expect(res.headers['x-shouldnt-work']).toBeUndefined();
     expect(res.headers.vary).toBeUndefined();
   });
 
   it('should flush headers first and delay to send data', () => {
+    let server: http.Server;
     return expect(new Promise(resolve => {
       const PassThrough = require('stream').PassThrough;
       const app = new Koa();
@@ -96,7 +98,7 @@ describe('ctx.flushHeaders()', () => {
         }, 10000);
       });
 
-      app.listen(function(err: Error) {
+      server = app.listen(function(err: Error) {
         if (err) return resolve(err);
 
         const port = this.address().port;
@@ -117,10 +119,11 @@ describe('ctx.flushHeaders()', () => {
           .on('error', resolve)
           .end();
       });
-    })).resolves.toBe('pass');
+    }).finally(() => { server.close(); })).resolves.toBe('pass');
   });
 
   it('should catch stream error', () => {
+    let server: http.Server;
     return new Promise(resolve => {
       const PassThrough = require('stream').PassThrough;
       const app = new Koa();
@@ -142,9 +145,9 @@ describe('ctx.flushHeaders()', () => {
         }, 100);
       });
 
-      const server = app.listen();
+      server = app.listen();
 
       request(server).get('/').end();
-    });
+    }).finally(() => { server.close(); });
   });
 });
