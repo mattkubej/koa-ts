@@ -192,9 +192,9 @@ export default class Response {
   }
 
   set type(type: string) {
-    type = getType(type);
-    if (type) {
-      this.set('Content-Type', type);
+    const contentType = getType(type);
+    if (contentType) {
+      this.set('Content-Type', contentType);
     } else {
       this.remove('Content-Type');
     }

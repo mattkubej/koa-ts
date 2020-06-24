@@ -6,9 +6,6 @@
     "moduleResolution": "node",
     "outDir": "./build/",
     "target": "es6",
-    "types": [
-      "only"
-    ],
     "typeRoots": [
       "src/types",
       "node_modules/@types"
