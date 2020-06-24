@@ -49,7 +49,6 @@ type HandleRequestFn = (req: http.IncomingMessage, res: http.ServerResponse) => 
 export default class Application extends EventEmitter {
   public silent: boolean;
 
-  // TODO: validate types;
   public proxy: boolean;
   public proxyIpHeader: string;
   public maxIpsCount: number;
@@ -201,8 +200,6 @@ function respond(ctx: Context) {
     if (ctx.req.httpVersionMajor >= 2) {
       body = String(code);
     } else {
-      // TODO: this differs from the original implementation, but supports
-      //       existing tests
       body = ctx.message || statuses.message[code] || String(code);
     }
     if (!res.headersSent) {
