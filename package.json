@@ -21,6 +21,7 @@
     "@types/depd": "1.1.32",
     "@types/destroy": "1.0.0",
     "@types/encodeurl": "1.0.0",
+    "@types/escape-html": "1.0.0",
     "@types/fresh": "0.5.0",
     "@types/http-assert": "1.5.1",
     "@types/http-errors": "1.6.3",
