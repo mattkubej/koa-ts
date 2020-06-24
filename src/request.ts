@@ -352,5 +352,3 @@ export default class Request {
     ]);
   }
 }
-
-// TODO: util.inspect.custom

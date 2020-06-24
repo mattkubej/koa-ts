@@ -317,5 +317,3 @@ export default class Response {
     this.res.flushHeaders();
   }
 }
-
-// TODO: util.inspect.custom
