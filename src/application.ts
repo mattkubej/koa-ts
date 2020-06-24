@@ -10,6 +10,7 @@ import statuses from 'statuses';
 import Stream from 'stream';
 import util from 'util';
 import { HttpError, HttpErrorConstructor } from 'http-errors';
+import Keygrip from 'keygrip';
 
 import Context from './context';
 import Request from './request';
@@ -34,7 +35,7 @@ type Options = {
   proxyIpHeader?: string;
   maxIpsCount?: number;
   env?: string;
-  keys?: any; // TODO: what type is this?
+  keys?: string[] | Keygrip;
 };
 
 export type ApplicationJSON = {
