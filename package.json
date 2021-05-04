@@ -71,10 +71,10 @@
     "eslint-plugin-node": "11.1.0",
     "eslint-plugin-promise": "4.2.1",
     "eslint-plugin-standard": "4.0.1",
-    "jest": "26.0.1",
+    "jest": "26.6.3",
     "mm": "3.2.0",
     "statuses": "2.0.0",
     "supertest": "4.0.2",
-    "ts-jest": "26.1.0"
+    "ts-jest": "26.5.5"
   }
 }
